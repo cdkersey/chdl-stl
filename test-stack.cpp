@@ -13,7 +13,7 @@
 using namespace std;
 using namespace chdl;
 
-#define DEBUG
+//#define DEBUG
 
 template <unsigned N, unsigned SZ> bool test_Stack() {
   srand(0);

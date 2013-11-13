@@ -28,10 +28,10 @@ template <unsigned SZ, typename T>
     IF(doPop, top - Lit<SZ+1>(1)).
     ELSE(top);
 
-  bvec<SZ> topTrunc(top[range<0,SZ-1>()]),
-           next_topTrunc(next_top[range<0,SZ-1>()]);
+  bvec<SZ> wrAddr(top[range<0,SZ-1>()]),
+           rdAddr(next_top[range<0,SZ-1>()] - Lit<SZ>(1));
 
-  T head(LLRam(next_topTrunc, input, topTrunc, doPush && !pop));
+  T head(LLRam(rdAddr, input, wrAddr, doPush && !pop));
 
   return Mux(doPush, head, input);
 }

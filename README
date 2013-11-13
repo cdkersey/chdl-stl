@@ -9,19 +9,20 @@ the core features provided by CHDL.
 Contents
 --------
 
-  - API Documentation
-    - Queue
-  - Examples
+  1 API Documentation
+    1.1 Queue
+    1.2 Stack
+  2 Examples
 
-API Documentation
------------------
+1 API Documentation
+-------------------
 
-Queue
------
+1.1 Queue
+---------
 
 Description:
 
-  A 2^SZ-entry queue with a 1-cycle latency.
+  A 2^SZ-entry queue
 
   template <typename T, unsigned SZ>
     T Queue(T input, node push, node pop, bvec<SZ + 1> &sz);
@@ -34,11 +35,33 @@ Description:
     input - The item to be enqueued during any cycle in which push is high.
     push  - The "push" command.
     pop   - The "pop" command.
-    
 
   Outputs:
     sz      - Current number of items in the queue.
     returns - The head of the queue.
 
-Examples
---------
+1.2 Stack
+---------
+
+Description:
+
+  A 2^SZ-entry stack
+
+  template <typename T, unsigned SZ>
+    T Stack(T input, node push, node pop, bvec<SZ + 1> &sz);
+
+  Template parameters:
+    T  - The type of objects in the stack.
+    SZ - LOG2 of the number of entries in the stack.
+
+  Inputs:
+    input - The item to be pushed during any cycle in which push is high.
+    push  - The "push" command.
+    pop   - The "pop" command.
+
+  Outputs:
+    sz      - Current number of items in the stack.
+    returns - The contents of the top of the stack.
+
+2 Examples
+----------
