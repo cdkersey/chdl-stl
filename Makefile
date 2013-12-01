@@ -2,9 +2,9 @@ CHDL_PREFIX ?= /usr/local
 CXXFLAGS = -std=c++11
 LDLIBS = -lchdl
 
-HEADERS = queue.h stack.h
-TESTS = test-queue test-stack
-TEST_OUT = test-queue.out test-stack.out
+HEADERS = queue.h stack.h map.h
+TESTS = test-queue test-stack test-map
+TEST_OUT = test-queue.out test-stack.out test-map.out
 
 all : $(TESTS)
 
@@ -20,4 +20,4 @@ install:
 	$(CXX) $(CXXFLAGS)$(LDFLAGS)  -o $@ $< $(LDLIBS)
 
 clean:
-	rm -f *~ $(TESTS) $(TEST_OUT)
+	rm -f *~ $(TESTS) $(TEST_OUT) *.vcd
