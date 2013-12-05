@@ -15,12 +15,18 @@ using namespace chdl;
 
 // #define DEBUG
 
-template <unsigned N, unsigned SZ> bool test_Queue() {
+template <unsigned N, unsigned SZ> bool test_Queue(bool sync) {
   srand(0);
 
   node push, pop;
   bvec<SZ+1> sz;
-  bvec<N> qin, qout(Queue<SZ>(qin, push, pop, sz));
+  bvec<N> qin, qout;
+  
+  if (sync)
+    qout = SyncQueue<SZ>(qin, push, pop, sz);
+  else
+    qout = Queue<SZ>(qin, push, pop, sz);
+
 
   bool pushv, popv;
   unsigned szv, qinv, qoutv;
@@ -34,7 +40,7 @@ template <unsigned N, unsigned SZ> bool test_Queue() {
 
   optimize();
 
-  unsigned long max_length(1<<SZ);
+  unsigned long max_length(1<<SZ), prev_front(0);
   queue<int> comp_queue;
 
   for (unsigned i = 0; i < 4000; ++i) {
@@ -45,14 +51,19 @@ template <unsigned N, unsigned SZ> bool test_Queue() {
     #ifdef DEBUG
     cout << sim_time() << ": qout = " << qoutv << ", sz = " << szv;
     if (comp_queue.size() > 0)
-      cout << ", cqo = " << comp_queue.front();
+      cout << ", cqo = " << prev_front;
     cout << ", cqsz = " << comp_queue.size() << endl;
     #endif
 
     if (comp_queue.size() != szv) return false;
-    if (comp_queue.size() > 0 && comp_queue.front() != qoutv) return false;
+    if (comp_queue.size() > 0 && prev_front != qoutv) return false;
 
     bool full(szv == max_length), empty(szv == 0);
+
+    if (sync) {
+      if (comp_queue.size() != 0) prev_front = comp_queue.front();
+      else prev_front = 0;
+    }
 
     if (pushv && (!full || popv)) {
       #ifdef DEBUG
@@ -67,6 +78,11 @@ template <unsigned N, unsigned SZ> bool test_Queue() {
       #endif
       comp_queue.pop();
     }
+ 
+    if (!sync) {
+      if (comp_queue.size() != 0) prev_front = comp_queue.front();
+      else prev_front = 0;
+    }
 
     advance();
   }
@@ -75,11 +91,14 @@ template <unsigned N, unsigned SZ> bool test_Queue() {
 }
 
 int main(int argc, char** argv) {
-  if (!test_Queue<8, 8>()) return 1;
 
+  if (!test_Queue<8, 8>(false)) return 1;
   reset();
-
-  if (!test_Queue<9, 4>()) return 1;
+  if (!test_Queue<8, 8>(true)) return 1;
+  reset();
+  if (!test_Queue<9, 4>(false)) return 1;
+  reset();
+  if (!test_Queue<9, 4>(true)) return 1;
 
   return 0;
 }
