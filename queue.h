@@ -80,6 +80,11 @@ template <unsigned SZ, typename T>
     IF(doPush, back + Lit<SZ>(1)).
     ELSE(back);
 
+  std::cout << "Tapping all that stuff in queue, including back.\n";
+
+  TAP(full); TAP(empty); TAP(canPush); TAP(canPop); TAP(doPush); TAP(doPop);
+  TAP(next_front); TAP(front); TAP(next_sz); TAP(sz); TAP(back); TAP(next_back);
+
   T head(LLRam(next_front, input, back, doPush));
 
   return Mux(doPush && next_front == back, head, input);
