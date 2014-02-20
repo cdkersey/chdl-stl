@@ -46,9 +46,9 @@ template <unsigned K, unsigned V, unsigned SZ> bool test_Map() {
   map<int, int> comp_map;
 
   for (unsigned i = 0; i < 4000; ++i) {
-    dvv = i % (1ul<<V);
-    dkv = rand() % (1ul<<K);
-    qkv = rand() % (1ul<<K);
+    dvv = i % (1ull<<V);
+    dkv = rand() % (1ull<<K);
+    qkv = rand() % (1ull<<K);
     erasev = !(rand() % 5);
     writev = !erasev && !(rand() % 3);
 
