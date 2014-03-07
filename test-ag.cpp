@@ -31,9 +31,9 @@ void test_ag() {
 
   int vid_val[4][3], out_vid_val[3];
   for (unsigned i = 0; i < 4; ++i) {
-    video_t vid(Lookup<STP("video"), video_t>(av_t(sources[i])));
+    video_t vid(Lookup<STP("video")>(av_t(sources[i])));
     for (unsigned j = 0; j < 3; ++j) {
-      bvec<8> v(Lookup<STP("value"), vec<3, bvec<8> > >(vid)[j]);
+      bvec<8> v(Lookup<STP("value")>(vid)[j]);
       v = IngressInt<8>(vid_val[i][j]);
     }
   }
@@ -43,7 +43,7 @@ void test_ag() {
   video_t out_vid(_(dest, video_t, "video"));
   for (unsigned i = 0; i < 3; ++i)
     EgressInt(out_vid_val[i],
-              Lookup<STP("value"), vec<3, bvec<8> > >(out_vid)[i]);
+              Lookup<STP("value")>(out_vid)[i]);
 
   optimize();
 

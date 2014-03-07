@@ -130,6 +130,20 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
   typedef T content_t;
 };
 
+  struct emptytype;
+
+  template <typename NAME, typename AG> struct match_type {
+    typedef emptytype type;
+  };
+
+  template <typename NAME, typename T, typename NEXT>
+    struct match_type<NAME, ag<NAME, T, NEXT> >
+  { typedef T type; };
+
+  template <typename N1, typename N2, typename T, typename NEXT>
+    struct match_type<N1, ag<N2, T, NEXT> >
+  { typedef typename match_type<N1, NEXT>::type type; };
+
   // Even though we do implicit (flattening) conversions, this is provided for
   // compatibility. (TODO: and may cause some bugs)
   template <typename NAME, typename T, typename NEXT>
@@ -154,30 +168,15 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
     next.tap(prefix);
   }
 
-template <typename A, typename B, bool X> struct try_assign {
-  static void x(A &a, B& b) { a = b; }
-};
+  template <typename NAME, typename T, typename AG> T Lookup(AG a);
 
-template <typename A, typename B> struct try_assign<A, B, false> {
-  static void x(A &a, B& b) {}
-};
+  template <typename NAME, typename T, typename NEXT>
+    T Lookup(ag<NAME, T, NEXT> a)
+  { return a.contents; };
 
-template <typename T, typename AG> T Extract(AG &a) {
-  T r;
-
-  try_assign<T, typename AG::content_t,
-             std::is_assignable<T, typename AG::content_t>::value
-  >::x(r, a.contents);
-
-  return r;
-}
-
-template <typename NAME, typename T> T Lookup(const ag_endtype &x) {}
-
-template <typename NAME, typename T, typename AG> T Lookup(AG a) {
-  if (AG::template MATCH<NAME>()) return Extract<T>(a);
-  else return Lookup<NAME, T>(a.next);
-}
+  template <typename NAME, typename AG>
+    typename match_type<NAME, AG>::type Lookup(AG a)
+  { return Lookup<NAME, typename match_type<NAME, AG>::type>(a.next); };
 
 #ifndef CHDL_AG_DISABLE_UNDERSCORE
 #define _(ag, type, name) Lookup<STRTYPE(name), type>(ag)

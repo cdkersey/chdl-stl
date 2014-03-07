@@ -1,0 +1,11 @@
+ag.h
+----
+
+  Critical
+    - It's not clear why emptytype is necessary. Without it, nested aggregates
+      will evaluate match_type down all of the branches (match_type<NAME, T>
+      instead of just match_type<NAME, AG>)
+
+  Must fix
+
+  Nuisance
