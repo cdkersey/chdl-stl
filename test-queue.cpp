@@ -27,7 +27,6 @@ template <unsigned N, unsigned SZ> bool test_Queue(bool sync) {
   else
     qout = Queue<SZ>(qin, push, pop, sz);
 
-
   bool pushv, popv;
   unsigned szv, qinv, qoutv;
 

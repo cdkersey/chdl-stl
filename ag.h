@@ -130,13 +130,13 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
   typedef T content_t;
 };
 
-// Even though we do implicit (flattening) conversions, this is provided for
-// compatibility.
-template <typename NAME, typename T, typename NEXT>
-  bvec<sz<ag<NAME, T, NEXT> >::value> Flatten(const ag<NAME, T, NEXT> &a)
-{
-  return a;
-}
+  // Even though we do implicit (flattening) conversions, this is provided for
+  // compatibility. (TODO: and may cause some bugs)
+  template <typename NAME, typename T, typename NEXT>
+    bvec<sz<ag<NAME, T, NEXT> >::value> Flatten(const ag<NAME, T, NEXT> &a)
+  {
+    return a;
+  }
 
   template <typename NAME, typename T, typename NEXT>
     struct sz<ag<NAME, T, NEXT> > {
@@ -147,12 +147,12 @@ template <typename NAME, typename T, typename NEXT>
     void tap(std::string prefix, ag<NAME, T, NEXT> &a)
   { a.tap(prefix); }
 
-template<typename NAME, typename T, typename NEXT>
-  void ag<NAME, T, NEXT>::tap(std::string prefix)
-{
-  chdl::tap(prefix + '_' + NAME::str(), Flatten(contents));
-  next.tap(prefix);
-}
+  template<typename NAME, typename T, typename NEXT>
+    void ag<NAME, T, NEXT>::tap(std::string prefix)
+  {
+    chdl::tap(prefix + '_' + NAME::str(), contents);
+    next.tap(prefix);
+  }
 
 template <typename A, typename B, bool X> struct try_assign {
   static void x(A &a, B& b) { a = b; }

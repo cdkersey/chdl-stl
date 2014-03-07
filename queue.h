@@ -20,6 +20,8 @@ template <unsigned SZ, typename T>
 {
   using namespace chdl;
 
+  HIERARCHY_ENTER();
+
   bvec<SZ> next_front, front(Reg(next_front)), next_back, back(Reg(next_back));
   bvec<SZ+1> next_sz, sz(Reg(next_sz));
   szi = next_sz;
@@ -47,13 +49,19 @@ template <unsigned SZ, typename T>
 
   T head(Syncmem(next_front, input, back, doPush));
 
-  return Mux(Reg(doPush && next_front == back), head, Reg(input));
+  T rval(Mux(Reg(doPush && next_front == back), head, Reg(input)));
+
+  HIERARCHY_EXIT();
+
+  return rval;
 }
 
 template <unsigned SZ, typename T>
   T chdl::Queue(T input, chdl::node push, chdl::node pop, chdl::bvec<SZ+1> &szi)
 {
   using namespace chdl;
+
+  HIERARCHY_ENTER();
 
   bvec<SZ> next_front, front(Reg(next_front)), next_back, back(Reg(next_back));
   bvec<SZ+1> next_sz, sz(Reg(next_sz));
@@ -82,7 +90,11 @@ template <unsigned SZ, typename T>
 
   T head(LLRam(next_front, input, back, doPush));
 
-  return Mux(doPush && next_front == back, head, input);
+  T rval(Mux(doPush && next_front == back, head, input));
+
+  HIERARCHY_EXIT();
+
+  return rval;
 }
 
 
