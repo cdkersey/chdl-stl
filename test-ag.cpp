@@ -40,7 +40,7 @@ void test_ag() {
 
   dest = Mux(sel, sources);
   
-  video_t out_vid(_(dest, video_t, "video"));
+  video_t out_vid(_(dest, "video"));
   for (unsigned i = 0; i < 3; ++i)
     EgressInt(out_vid_val[i],
               Lookup<STP("value")>(out_vid)[i]);

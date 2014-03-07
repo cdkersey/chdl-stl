@@ -179,7 +179,7 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
   { return Lookup<NAME, typename match_type<NAME, AG>::type>(a.next); };
 
 #ifndef CHDL_AG_DISABLE_UNDERSCORE
-#define _(ag, type, name) Lookup<STRTYPE(name), type>(ag)
+#define _(ag, name) Lookup<STRTYPE(name)>(ag)
 #endif
 
 #define AG_1(t1, n1) ag<STRTYPE(n1), t1>
