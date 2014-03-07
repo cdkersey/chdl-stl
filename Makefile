@@ -2,9 +2,10 @@ CHDL_PREFIX ?= /usr/local
 CXXFLAGS = -std=c++11 -g
 LDLIBS = -lchdl
 
-HEADERS = queue.h stack.h map.h initmem.h
-TESTS = test-queue test-stack test-map test-initmem
-TEST_OUT = test-queue.out test-stack.out test-map.out test-initmem.out
+HEADERS = queue.h stack.h map.h initmem.h ag.h
+TESTS = test-queue test-stack test-map test-initmem test-ag
+TEST_OUT = test-queue.out test-stack.out test-map.out test-initmem.out \
+           test-ag.out
 
 all : $(TESTS)
 

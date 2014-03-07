@@ -10,15 +10,87 @@ Contents
 --------
 
   1 API Documentation
-    1.1 Queue
-    1.2 Stack
-    1.3 Map
+    1.1 Aggregate Types
+      1.1.1 strtype
+      1.1.2 ag
+    1.2 Queue
+    1.3 Stack
+    1.4 Map
   2 Examples
 
 1 API Documentation
 -------------------
 
-1.1 Queue
+1.1 Aggregate Types
+-------------------
+
+It is convenient when using CHDL to bundle together CHDL types into C++ structs
+and classes, so that collections of signals and functions operating on them may
+be passed all of these sinals as a bundle. The downside is that this collection
+of signals cannot then be easily, collectively tapped or operated on by CHDL
+standard library functions without this functionality being added manually for
+each such struct.
+
+C++ does not really provide the level of reflection needed to allow the
+creation of such utility functions as conversions to bvec at compile time for
+arbitrary structs, or if it does the author is not aware of it. Enter chdl::ag
+and the surrounding ecosystem of types, a way to get around this problem by
+replacing C++ structs with an equivalent template type.
+
+For example, say you had a library that used sign-exponent-mantissa floating
+point numbers. It may really be more appropriate to build these as a C++ class
+templates, but for the purposes of our example you could implement it using a
+CHDL aggregate (using C++11 alias templates) as:
+
+  template <unsigned E, unsigned M> using Float =
+    ag<STRTYPE("sign"),     node,
+    ag<STRTYPE("exponent"), bvec<E>,
+    ag<STRTYPE("mantissa"), bvec<M> > > >;
+
+The STRTYPE() macro converts an input string to a type, so that it may be
+evaluated and compared at compile time. Members of Float can be extracted using
+the Lookup<> function:
+
+  template <unsigned E, unsigned M> Float<E, M> Neg(Float<E, M> &in) {
+    Float<E, M> out;
+    Lookup<STRTYPE("sign"), node>(out) = !Lookup<STRTYPE("sign"), node>(in);
+    Lookup<STRTYPE("exponent"), bvec<E> >(out) =
+      Lookup<STRTYPE("exponent"), bvec<E> >(in);
+    Lookup<STRTYPE("mantissa"), bvec<M> >(out) =
+      Lookup<STRTYPE("mantissa"), bvec<M> >(in);
+
+    return out;
+  }
+
+This is rather verbose, but is made somewhat better by using the "_" macro:
+
+  template <unsigned E, unsigned M> Float<E, M> Neg(Float<E, M> &in) {
+    Float<E, M> out;
+    _(out, node, "sign") = !_(in, node, "sign");
+    _(out, bvec<E>, "exponent") = _(in, bvec<E>, "exponent");
+    _(out, bvec<M>, "mantissa") = _(in, bvec<M>, "mantissa");
+    Lookup<STRTYPE("sign"), node>(out) = !
+  }
+
+Of course, this is a potentially contentuous macro name, and in the event of a
+conflict, it can be disabled by defining CHDL_AG_DISABLE_UNDERSCORE before
+including ag.h.
+
+1.1.1 strtype<C, NEXT>
+----------------------
+
+Description:
+
+  A template that encodes a string as a linked list of types.
+
+1.1.2 ag<NAME, T, NEXT>
+-----------------------
+
+Description:
+
+  A template that encodes a structured data type as a linked list of types.
+
+1.2 Queue
 ---------
 
 Description:
@@ -41,7 +113,7 @@ Description:
     sz      - Current number of items in the queue.
     returns - The head of the queue.
 
-1.2 Stack
+1.3 Stack
 ---------
 
 Description:
@@ -64,7 +136,7 @@ Description:
     sz      - Current number of items in the stack.
     returns - The contents of the top of the stack.
 
-1.3 Map
+1.4 Map
 -------
 
 Description:

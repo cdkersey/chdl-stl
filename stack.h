@@ -31,8 +31,7 @@ template <unsigned SZ, typename T>
   bvec<SZ> wrAddr(top[range<0,SZ-1>()]),
            rdAddr(next_top[range<0,SZ-1>()] - Lit<SZ>(1));
 
-  const unsigned T_SZ(T::SZ());
-  bvec<T_SZ> head(LLRam(rdAddr, bvec<T_SZ>(input), wrAddr, doPush && !pop));
+  bvec<sz<T>::value> head(LLRam(rdAddr, Flatten(input), wrAddr, doPush&&!pop));
 
   return T(Mux(doPush, head, input));
 }
