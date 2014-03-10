@@ -168,15 +168,17 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
     next.tap(prefix);
   }
 
-  template <typename NAME, typename T, typename AG> T Lookup(AG a);
+  template <typename NAME, typename T, typename AG> T Lookup(AG a) {
+    abort();
+  }
 
   template <typename NAME, typename T, typename NEXT>
     T Lookup(ag<NAME, T, NEXT> a)
-  { return a.contents; };
+  { return a.contents; }
 
   template <typename NAME, typename AG>
     typename match_type<NAME, AG>::type Lookup(AG a)
-  { return Lookup<NAME, typename match_type<NAME, AG>::type>(a.next); };
+  { return Lookup<NAME, typename match_type<NAME, AG>::type>(a.next); }
 
 #ifndef CHDL_AG_DISABLE_UNDERSCORE
 #define _(ag, name) Lookup<STRTYPE(name)>(ag)
