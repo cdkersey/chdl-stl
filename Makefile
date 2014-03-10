@@ -1,5 +1,5 @@
 CHDL_PREFIX ?= /usr/local
-CXXFLAGS = -std=c++11 -O3
+CXXFLAGS = -std=c++11 -g
 LDLIBS = -lchdl
 
 HEADERS = queue.h stack.h map.h initmem.h ag.h

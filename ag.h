@@ -127,6 +127,7 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
   T contents;
   NEXT next;
   typedef NEXT next_t;
+  typedef NAME name_t;
   typedef T content_t;
 };
 
@@ -168,17 +169,29 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
     next.tap(prefix);
   }
 
-  template <typename NAME, typename T, typename AG> T Lookup(AG a) {
-    abort();
-  }
+  template <typename QNAME, typename NAME, typename T, typename NEXT>
+    struct lookup
+  {
+    //lookup(ag<NAME, T, NEXT> &a): value(lookup<QNAME, typename ag<NAME, T, NEXT>::next_t::name_t, typename ag<NAME, T, NEXT>::content_t, NEXT>(a.next).value) {}
+    lookup(ag<NAME, T, NEXT> &a) {}
+    typename match_type<NAME, NEXT>::type &value;
+  };
 
+#if 0
   template <typename NAME, typename T, typename NEXT>
-    T Lookup(ag<NAME, T, NEXT> a)
-  { return a.contents; }
+    struct lookup<NAME, NAME, T, NEXT>
+  {
+    lookup(ag<NAME, T, NEXT> &a): value(a.contents) {}
+    T &value;
+  };
+#endif
 
-  template <typename NAME, typename AG>
-    typename match_type<NAME, AG>::type Lookup(AG a)
-  { return Lookup<NAME, typename match_type<NAME, AG>::type>(a.next); }
+  template <typename QNAME, typename NAME, typename T, typename NEXT>
+    typename match_type<QNAME, ag<NAME, T, NEXT> >::type
+      Lookup(ag<NAME, T, NEXT> a)
+  {
+    //return lookup<QNAME, NAME, T, NEXT>(a).value;
+  }
 
 #ifndef CHDL_AG_DISABLE_UNDERSCORE
 #define _(ag, name) Lookup<STRTYPE(name)>(ag)
