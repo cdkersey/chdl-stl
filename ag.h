@@ -4,12 +4,14 @@
 #include <string>
 #include <sstream>
 #include <type_traits>
+#include <typeinfo>
 
 #include <chdl/chdl.h>
 
 namespace chdl {
 
-struct strtype_term {
+// strtype: a way to represent strings as types
+struct strtype_term { // Marks the end of a strtype
   static constexpr char VAL() { return '\0'; }
   template <typename S2> static constexpr bool MATCH() {
     return VAL() == S2::VAL();
@@ -172,25 +174,29 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
   template <typename QNAME, typename NAME, typename T, typename NEXT>
     struct lookup
   {
-    //lookup(ag<NAME, T, NEXT> &a): value(lookup<QNAME, typename ag<NAME, T, NEXT>::next_t::name_t, typename ag<NAME, T, NEXT>::content_t, NEXT>(a.next).value) {}
-    lookup(ag<NAME, T, NEXT> &a) {}
-    typename match_type<NAME, NEXT>::type &value;
+  lookup(ag<NAME, T, NEXT> &a):
+    value(lookup<
+      QNAME,
+      typename ag<NAME, T, NEXT>::next_t::name_t,
+      typename ag<NAME, T, NEXT>::next_t::content_t,
+      typename ag<NAME, T, NEXT>::next_t::next_t
+    >(a.next).value) {}
+
+    typename match_type<QNAME, ag<NAME, T, NEXT> >::type &value;
   };
 
-#if 0
   template <typename NAME, typename T, typename NEXT>
     struct lookup<NAME, NAME, T, NEXT>
   {
     lookup(ag<NAME, T, NEXT> &a): value(a.contents) {}
     T &value;
   };
-#endif
 
   template <typename QNAME, typename NAME, typename T, typename NEXT>
     typename match_type<QNAME, ag<NAME, T, NEXT> >::type
       Lookup(ag<NAME, T, NEXT> a)
   {
-    //return lookup<QNAME, NAME, T, NEXT>(a).value;
+    return lookup<QNAME, NAME, T, NEXT>(a).value;
   }
 
 #ifndef CHDL_AG_DISABLE_UNDERSCORE
