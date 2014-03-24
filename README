@@ -53,11 +53,9 @@ the Lookup<> function:
 
   template <unsigned E, unsigned M> Float<E, M> Neg(Float<E, M> &in) {
     Float<E, M> out;
-    Lookup<STRTYPE("sign"), node>(out) = !Lookup<STRTYPE("sign"), node>(in);
-    Lookup<STRTYPE("exponent"), bvec<E> >(out) =
-      Lookup<STRTYPE("exponent"), bvec<E> >(in);
-    Lookup<STRTYPE("mantissa"), bvec<M> >(out) =
-      Lookup<STRTYPE("mantissa"), bvec<M> >(in);
+    Lookup<STRTYPE("sign")>(out) = !Lookup<STRTYPE("sign")>(in);
+    Lookup<STRTYPE("exponent")>(out) = Lookup<STRTYPE("exponent")>(in);
+    Lookup<STRTYPE("mantissa")>(out) = Lookup<STRTYPE("mantissa")>(in);
 
     return out;
   }
@@ -66,10 +64,11 @@ This is rather verbose, but is made somewhat better by using the "_" macro:
 
   template <unsigned E, unsigned M> Float<E, M> Neg(Float<E, M> &in) {
     Float<E, M> out;
-    _(out, node, "sign") = !_(in, node, "sign");
-    _(out, bvec<E>, "exponent") = _(in, bvec<E>, "exponent");
-    _(out, bvec<M>, "mantissa") = _(in, bvec<M>, "mantissa");
-    Lookup<STRTYPE("sign"), node>(out) = !
+    _(out, "sign") = !_(in, "sign");
+    _(out, "exponent") = _(in, "exponent");
+    _(out, "mantissa") = _(in, "mantissa");
+    
+    return out;
   }
 
 Of course, this is a potentially contentuous macro name, and in the event of a
