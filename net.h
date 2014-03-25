@@ -30,12 +30,6 @@ namespace chdl {
 
     out_vec = SyncQueue<SZ>(in_vec, push, pop, occupancy_x);
 
-    TAP(occupancy);
-    TAP(full);
-    TAP(empty);
-    TAP(push);
-    TAP(pop);
-
     HIERARCHY_EXIT();
   }
 
@@ -83,9 +77,8 @@ namespace chdl {
   template <unsigned N>
     void ArbUniq(bvec<CLOG2(N)> &sel, bvec<N> &v, node out_ready)
   {
-    sel = Enc(v);
- 
-    ASSERT(!OrN((Lit<N>(1) << sel) & v));
+    sel = Log2(v);
+    ASSERT(!OrN(~(Lit<N>(1)<<sel) & v));
   }
 
   template <unsigned N, typename T, typename F>
@@ -105,9 +98,6 @@ namespace chdl {
 
     // Input is ready if all of the selected outputs are also ready
     _(in, "ready") = AndN((~Lit<N>(0) & ~valid) | ready);
-
-    TAP(valid);
-    TAP(ready);
 
     HIERARCHY_EXIT();
   }
