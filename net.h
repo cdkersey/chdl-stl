@@ -79,6 +79,15 @@ namespace chdl {
     HIERARCHY_EXIT();
   }
 
+  // An arbiter selection function which expects only one input to be valid
+  template <unsigned N>
+    void ArbUniq(bvec<CLOG2(N)> &sel, bvec<N> &v, node out_ready)
+  {
+    sel = Enc(v);
+ 
+    ASSERT(!OrN((Lit<N>(1) << sel) & v));
+  }
+
   template <unsigned N, typename T, typename F>
     void Router(vec<N, flit<T> > &out, const F &func, flit<T> &in)
   {
