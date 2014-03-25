@@ -140,7 +140,7 @@ Description:
 
 Description:
 
-  A SZ-entry fully-associative meory holding key/value pairs
+  A SZ-entry fully-associative memory holding key/value pairs
 
   Template parameters:
     K  - Number of bits in key.
