@@ -80,7 +80,7 @@ template <unsigned N> constexpr char _xt(const char (&s)[N], unsigned i) {
 #define STP(x) STRTYPE(x)
 
 struct ag_endtype {
-  void tap(std::string prefix) {}
+  void tap(std::string prefix, bool output = false) const {}
   ag_endtype &operator=(const ag_endtype &r) { return *this; }
   operator chdl::bvec<0>() const { return chdl::bvec<0>(); }
 };
@@ -124,7 +124,7 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
     return *this;
   }
 
-  void tap(std::string prefix = "");
+  void tap(std::string prefix = "", bool output = false) const;
 
   T contents;
   NEXT next;
@@ -161,14 +161,14 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
     };
 
   template <typename NAME, typename T, typename NEXT>
-    void tap(std::string prefix, ag<NAME, T, NEXT> &a)
-  { a.tap(prefix); }
+    void tap(std::string prefix, const ag<NAME, T, NEXT> &a, bool output=false)
+  { a.tap(prefix, output); }
 
   template<typename NAME, typename T, typename NEXT>
-    void ag<NAME, T, NEXT>::tap(std::string prefix)
+    void ag<NAME, T, NEXT>::tap(std::string prefix, bool output) const
   {
-    chdl::tap(prefix + '_' + NAME::str(), contents);
-    next.tap(prefix);
+    chdl::tap(prefix + '_' + NAME::str(), contents, output);
+    next.tap(prefix, output);
   }
 
   template <typename QNAME, typename NAME, typename T, typename NEXT>
