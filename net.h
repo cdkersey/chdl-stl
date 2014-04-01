@@ -68,7 +68,13 @@ namespace chdl {
 
     // Implicitly assumes N is a power of 2. Should probably just pad it if it
     // isn't. TODO: Document this or log it as a bug.
-    sel = pos + Log2(RotL(v, pos));
+    sel = Log2(RotL(v, pos)) - pos;
+
+    tap("arb_rr_sel", sel);
+    tap("arb_rr_pos", pos);
+    tap("arb_rr_rotval", RotL(v, pos));
+    tap("arb_rr_nextpos", next_pos);
+    tap("arb_rr_v", v);
 
     HIERARCHY_EXIT();
   }
