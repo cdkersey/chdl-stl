@@ -2,8 +2,8 @@
 #define CHDL_NET_H
 
 #include <chdl/chdl.h>
-#include <chdl/ag.h>
-#include <chdl/queue.h>
+#include "ag.h"
+#include "queue.h"
 
 namespace chdl {
   template <typename T> using flit =
