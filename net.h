@@ -68,7 +68,7 @@ namespace chdl {
 
     // Implicitly assumes N is a power of 2. Should probably just pad it if it
     // isn't. TODO: Document this or log it as a bug.
-    sel = Log2(RotL(v, pos)) - pos;
+    sel = Log2(RotR(v, pos)) + pos;
 
     tap("arb_rr_sel", sel);
     tap("arb_rr_pos", pos);
