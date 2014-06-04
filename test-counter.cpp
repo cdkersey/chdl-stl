@@ -37,26 +37,34 @@ node Lfsr(unsigned seed) {
 bool test_Counter() {
   node x = Lfsr(0x5eed), y = Lfsr(0x1234);
 
-  bvec<CTRSIZE> cx = Counter("x", x), cy = Counter("y", y);
+  bvec<2> xy;
+  xy[0] = y;
+  xy[1] = x;
 
-  unsigned long cxval, cyval;
+  bvec<CTRSIZE> cx = Counter("x", x), cy = Counter("y", y),
+                cxy = Counter("xy", xy);;
+
+  unsigned long cxval, cyval, cxyval, xyval;
   bool xval(false), yval(false);
   Egress(xval, x);
   Egress(yval, y);
+  EgressInt(xyval, xy);
   EgressInt(cxval, cx);
   EgressInt(cyval, cy);
+  EgressInt(cxyval, cxy);
 
   optimize();
 
-  unsigned long ext_xcount(0), ext_ycount(0);
+  unsigned long ext_xcount(0), ext_ycount(0), ext_xycount(0);
   for (unsigned cyc = 0; cyc < 10000; ++cyc) {
-    if (xval) ext_xcount++;
-    if (yval) ext_ycount++;
+    if (xval) { ext_xcount++; ext_xycount += 2; }
+    if (yval) { ext_ycount++; ext_xycount++; }
 
     advance();
 
     if (ext_ycount != cyval) return false;
     if (ext_xcount != cxval) return false;
+    if (ext_xycount != cxyval) return false;
   }
 
   return true;
