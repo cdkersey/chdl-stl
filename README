@@ -21,6 +21,7 @@ Contents
      1.5.2 Buffer
      1.5.3 Arbiter
      1.5.4 Router
+    1.6 Counter
   2 Examples
 
 1 API Documentation
@@ -178,6 +179,18 @@ Description:
 
 1.5.4 Router
 ------------
+
+1.6 Counter
+-----------
+
+"Counter" exists to add simple stat-gathering counters to any design. These can
+be of arbitrary size, but they default to 32 bits. A Counter will automatically
+create a CHDL tap, so for example:
+
+  Counter("x_transitions", x != Reg(x));
+
+is all that is required to add "counter_x_transitions" to the output .vcd file
+when simulating.
 
 2 Examples
 ----------
