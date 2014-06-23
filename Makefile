@@ -4,9 +4,9 @@ LDLIBS = -lchdl
 
 HEADERS = queue.h stack.h map.h initmem.h ag.h net.h counter.h
 TESTS = test-queue test-stack test-map test-initmem test-ag test-net \
-        test-counter
+        test-counter test-lfsr
 TEST_OUT = test-queue.out test-stack.out test-map.out test-initmem.out \
-           test-ag.out test-net.out test-counter.out
+           test-ag.out test-net.out test-counter.out test-lfsr.out
 
 all : $(TESTS)
 

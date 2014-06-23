@@ -22,6 +22,7 @@ Contents
      1.5.3 Arbiter
      1.5.4 Router
     1.6 Counter
+    1.7 Linear Feedback Shift Register
   2 Examples
 
 1 API Documentation
@@ -191,6 +192,47 @@ create a CHDL tap, so for example:
 
 is all that is required to add "counter_x_transitions" to the output .vcd file
 when simulating.
+
+1.7 Linear Feedback Shift Register
+----------------------------------
+
+Linear feedback shift registers are a well-known inexpensive hardware random
+number generator. Even in their most basic form, an N-bit LFSR will have a
+2^N - 1 cycle length if the parameters are well-chosen (corresponding to what
+is known as a primitive trinomial).
+
+The CHDL STL LFSR can perform multiple iterations per cycle, producing multiple
+bits of output. The period of this new configuration is simply (2^N - 1)/M,
+with the caveat that the repetitions may be bit shifted. Due to its efficiency,
+large periods can be obtained with a small amount of circuitry. With 65 bits of
+state, a circuit can produce a large number of pseudorandom bits for decades
+without repeating itself.
+
+Some selected primitive trinomials taken from the list distributed with the
+libecc source (of course with no warranty). The time given is the amount of
+time it would take, assuming the LFSR is used to produce 32 bits of output per
+nanosecond, for the LFSR to begin repeating itself:
+
+                   N  | TAP | Log10(Period) | Time @32b/ns
+                ------+-----+---------------+--------------
+                   17 |   3 |       5.1     |      4 us
+                   33 |  10 |       9.9     |     268 ms
+                   65 |  18 |      19.5     |    36 years
+                  129 |   5 |      38.8     |  6.7e20 years
+                  257 |  12 |      77.3     |  2.2e50 years
+                  513 |  85 |     154.4     |  2.6e127 years
+                 1023 |   7 |     307.9     |  8.9e280 years
+
+This has many uses. In the following example, the outputs of four LFSRs
+(presumed to be uniformly distributed) are summed to produce a result with an
+approximately normal distribution:
+
+  bvec<8> norm(node advance) {
+    bvec<6> l0(Lfsr<6, 33, 10, 1>(advance)), l1(Lfsr<6, 34, 7, 4>(advance)),
+            l2(Lfsr<6, 33, 13, 2>(advance)), l3(Lfsr<6, 35, 2, 8>(advance));
+
+    return Zext<8>(l0) + Zext<8>(l1) + Zext<8>(l2) + Zext<8>(l3);
+  }
 
 2 Examples
 ----------
