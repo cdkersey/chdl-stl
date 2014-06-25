@@ -23,6 +23,7 @@ Contents
      1.5.4 Router
     1.6 Counter
     1.7 Linear Feedback Shift Register
+    1.8 Hash functions
   2 Examples
 
 1 API Documentation
@@ -233,6 +234,16 @@ approximately normal distribution:
 
     return Zext<8>(l0) + Zext<8>(l1) + Zext<8>(l2) + Zext<8>(l3);
   }
+
+1.8 Hash Functions
+------------------
+
+A framework for creating simple non-cryptographic hash functions is provided.
+These use the method of binary matrix multiplication to produce hash functions
+useful for a wide variety of hardware applications. Versions of the Hash()
+module are available that generate this matrix from a seed value, take this
+matrix as a multidimensional CHDL vec, and that take this matrix as a CHDL vec
+of M unsigned longs.
 
 2 Examples
 ----------
