@@ -24,6 +24,7 @@ Contents
     1.6 Counter
     1.7 Linear Feedback Shift Register
     1.8 Hash functions
+    1.9 Bloom Filter
   2 Examples
 
 1 API Documentation
@@ -244,6 +245,38 @@ useful for a wide variety of hardware applications. Versions of the Hash()
 module are available that generate this matrix from a seed value, take this
 matrix as a multidimensional CHDL vec, and that take this matrix as a CHDL vec
 of M unsigned longs.
+
+1.9 Bloom Filter
+----------------
+
+Bloom filters take a probabilistic approach to representing sets of objects.
+They have constant lookup time and storage cost, but may experience false
+positives. This makes them very useful for hardware structures such as
+predictors that can tolerate occasional errors.
+
+Description:
+
+  A 2^SZ-entry, H-hash-function Bloom filter.
+
+  template <unsigned SZ, unsigned H, unsigned N>
+    node BloomFilter(bvec<N> query, bvec<N> insert,
+                     node wr, node clear,
+                     unsigned long seed = 0)
+
+  Template parameters:
+    SZ - LOG2 of the number of bits of storage (registers).
+     H - Number of hash functions
+     N - Number of bits in input
+
+  Inputs:
+     query - Query value.
+    insert - Value to be inserted.
+        wr - Insert value into the bloom filter.
+     clear - Remove all entries from bloom filter.
+      seed - Seed for the RNG used to generate the hash functions.
+
+  Outputs:
+    returns - 1 for hit (0-cycle latency)
 
 2 Examples
 ----------
