@@ -18,6 +18,13 @@ namespace chdl {
 
     tap(std::string("counter_") + name, count);
 
+    unsigned long *cval(new unsigned long());
+    *cval = 0;
+    EgressInt(*cval, count);
+    finally([cval, name]{
+      std::cout << "Counter \"" << name << "\":" << *cval << std::endl;
+    });
+
     return count;
   }
 
