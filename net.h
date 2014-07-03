@@ -87,6 +87,13 @@ namespace chdl {
     ASSERT(!OrN(~(Lit<N>(1)<<sel) & v));
   }
 
+  // A priority arbiter; lower-numbered inputs are higher priority
+  template <unsigned N>
+    void ArbPriority(bvec<CLOG2(N)> &sel, bvec<N> &v, node out_ready)
+  {
+    sel = Lsb(v);
+  }
+
   template <unsigned N, typename T, typename F>
     void Router(vec<N, flit<T> > &out, const F &func, flit<T> &in)
   {

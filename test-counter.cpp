@@ -67,6 +67,8 @@ bool test_Counter() {
     if (ext_xycount != cxyval) return false;
   }
 
+  call_final_funcs();
+
   return true;
 }
 

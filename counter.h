@@ -1,6 +1,7 @@
 #ifndef CHDL_COUNTER
 #define CHDL_COUNTER
 
+#include <iostream>
 #include <string>
 
 #include <chdl/chdl.h>
@@ -17,6 +18,13 @@ namespace chdl {
     count = Reg(count + Zext<N>(x));
 
     tap(std::string("counter_") + name, count);
+    tap(std::string("increment_counter_") + name, x);
+
+    unsigned *ctrval = new unsigned(0);
+    EgressInt(*ctrval, count);
+    finally([name, ctrval]() {
+      std::cout << "Counter \"" << name << "\": " << *ctrval << std::endl;
+    });
 
     unsigned long *cval(new unsigned long());
     *cval = 0;

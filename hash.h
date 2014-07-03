@@ -17,8 +17,8 @@ namespace chdl {
     for (unsigned i = 0; i < M; ++i)
       r[i] = XorN(m[i] & x);
 
-    return r;
     HIERARCHY_EXIT();
+    return r;
   }
 
   template <unsigned M, unsigned N>
