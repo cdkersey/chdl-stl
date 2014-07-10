@@ -5,6 +5,7 @@
 #include <string>
 
 #include <chdl/chdl.h>
+#include <chdl/egress.h>
 
 namespace chdl {
   // The default counter size
@@ -20,10 +21,10 @@ namespace chdl {
     tap(std::string("counter_") + name, count);
     tap(std::string("increment_counter_") + name, x);
 
-    unsigned *ctrval = new unsigned(0);
-    EgressInt(*ctrval, count);
-    finally([name, ctrval]() {
-      std::cout << "Counter \"" << name << "\": " << *ctrval << std::endl;
+    unsigned long *cval(new unsigned long(0));
+    EgressInt(*cval, count);
+    finally([cval, name]{
+      std::cout << "Counter \"" << name << "\":" << *cval << std::endl;
     });
 
     return count;
