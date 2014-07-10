@@ -62,9 +62,14 @@ bool test_Counter() {
 
     advance();
 
+    #ifdef DEBUG
+    cout << "xcount = " << cxval << '/' << ext_xcount << ", "
+         << "ycount = " << cyval << '/' << ext_ycount << endl;
+    #else
     if (ext_ycount != cyval) return false;
     if (ext_xcount != cxval) return false;
     if (ext_xycount != cxyval) return false;
+    #endif
   }
 
   call_final_funcs();

@@ -12,10 +12,10 @@ namespace chdl {
 
   // Value is returned primarily for testing
   template <unsigned M, unsigned N = CTRSIZE>
-    bvec<N> Counter(std::string name, bvec<M> x)
+    bvec<N> Counter(std::string name, bvec<M> x, node enable = Lit(1))
   {
     bvec<N> count;
-    count = Reg(count + Zext<N>(x));
+    count = Wreg(enable, count + Zext<N>(x));
 
     tap(std::string("counter_") + name, count);
     tap(std::string("increment_counter_") + name, x);
@@ -31,7 +31,7 @@ namespace chdl {
 
   template <unsigned N = CTRSIZE>
     bvec<N> Counter(std::string name, node x)
-  { return Counter(name, bvec<1>(x)); }
+  { return Counter(name, Lit<1>(1), x); }
 
   #define COUNTER(x) do { Counter(#x, x); } while(0)
 }
