@@ -47,7 +47,7 @@ template <unsigned SZ, typename T>
     IF(doPush, back + Lit<SZ>(1)).
     ELSE(back);
 
-  T head(Syncmem(next_front, input, back, doPush));
+  T head(Syncmem(next_front, Flatten(input), back, doPush));
 
   T rval(Mux(Reg(doPush && next_front == back), head, Reg(input)));
 
@@ -88,7 +88,7 @@ template <unsigned SZ, typename T>
     IF(doPush, back + Lit<SZ>(1)).
     ELSE(back);
 
-  T head(LLRam(next_front, input, back, doPush));
+  T head(LLRam(next_front, Flatten(input), back, doPush));
 
   T rval(Mux(doPush && next_front == back, head, input));
 
