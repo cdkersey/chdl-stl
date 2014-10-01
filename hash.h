@@ -5,7 +5,6 @@
 #include <random>
 #include <vector>
 #include <chdl/chdl.h>
-#include <chdl/counter.h>
 
 namespace chdl {
   template <unsigned M, unsigned N>
