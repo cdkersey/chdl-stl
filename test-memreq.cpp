@@ -38,22 +38,17 @@ void reset_delete_on_reset() {
 
 CHDL_REGISTER_RESET(reset_delete_on_reset);
 
-map<ucycle_t, set<function<void(*)()> > > eq;
+map<cycle_t, set<function<void()> > > eq;
 static void advance_eq(cycle_t cyc) {
-  
+  if (eq.count(cyc) ) {
+    for (auto &f : eq[cyc]) f();
+    eq.erase(cyc);
+  }
 }
 
 void clear_eq() { eq.clear(); }
 
 CHDL_REGISTER_RESET(clear_eq);
-
-template <unsigned N> struct respval {
-  bool wr;
-  unsigned long q[N];
-  unsigned id;
-
-  random_delay_mem *mem;
-};
 
 template <unsigned SZ, unsigned B, unsigned N, unsigned A, unsigned I>
   class random_delay_mem : public delete_on_reset
@@ -62,11 +57,19 @@ template <unsigned SZ, unsigned B, unsigned N, unsigned A, unsigned I>
   random_delay_mem(mem_resp<B, N, I> &resp, mem_req<B, N, A, I> &req) {
   }
 
-  bool req_valid;
+  bool req_valid, req_wr, req_mask[N];
   unsigned long req_addr;
   unsigned req_id;
   unsigned long req_d[N];
   unsigned long contents[1<<SZ][N];
+
+  struct respval {
+    bool wr;
+    unsigned long q[N];
+    unsigned id;
+
+    random_delay_mem *mem;
+  };
 };
 
 
