@@ -34,33 +34,31 @@ namespace chdl {
   // A very basic 1-cycle latency SRAM using the mem_req interface. Addresses
   // are truncated.
   template<unsigned SZ, unsigned B, unsigned N, unsigned A, unsigned I>
-    void Scratchpad(mem_resp<B, N, I> &resp_buf, mem_req<B, N, A, I> &req)
+    void Scratchpad(mem_resp<B, N, I> &resp, mem_req<B, N, A, I> &req)
   {
-    mem_resp<B, N, I> resp;
+    _(req, "ready") = _(resp, "ready");
 
-    bvec<N> wr = 
-        bvec<N>(_(_(req, "contents"), "wr")) & _(_(req, "contents"), "mask");
-    bvec<SZ> addr(Zext<SZ>(_(_(req, "contents"), "addr")));
-    vec<N, bvec<B> > d(_(_(req, "contents"), "data"));
+    node next(_(req, "valid") && _(req, "ready"));
+
+    TAP(next);
+
+    vec<N, bvec<B> > d = _(_(req, "contents"), "data");
+    bvec<N> wr = bvec<N>(next && _(_(req, "contents"), "wr"))
+                   & _(_(req, "contents"), "mask");
+    bvec<A> addr = Latch(!next, _(_(req, "contents"), "addr"));
 
     for (unsigned i = 0; i < N; ++i)
       _(_(resp, "contents"), "data")[i] = Syncmem(addr, d[i], wr[i]);
 
-    // Load linked/store conditional can only be handled on multi-ported memory
-    // interfaces. Since we don't support it, we'll always fail LL/SC.
-    _(_(resp, "contents"), "llsc") = Reg(_(_(req, "contents"), "llsc"));
-    _(_(resp, "contents"), "id") = Reg(_(_(req, "contents"), "id"));
-    _(_(resp, "contents"), "llsc_suc") = Lit(0);
+    _(_(resp, "contents"), "wr") = Wreg(next, _(_(req, "contents"), "wr"));
+    _(_(resp, "contents"), "id") = Wreg(next, _(_(req, "contents"), "id"));    
 
-
-    // Backpressure passthrough. Don't accept any new requets while we're not
-    // shipping back the previous ones. This can lead to deadlock. If this
-    // happens, network buffers are needed.
-    _(req, "ready") = _(resp, "ready");
-    _(resp, "valid") = Reg(_(req, "valid"));
-    _(_(resp, "contents"), "id") = Reg(_(_(req, "contents"), "id"));
-
-    Buffer<1>(resp_buf, resp);
+    node next_valid, valid(Reg(next_valid));
+    _(resp, "valid") = valid;
+    Cassign(next_valid).
+      IF(!next && valid && _(resp, "ready"), Lit(0)).
+      IF(next, Lit(1)).
+      ELSE(valid);
   }
 
 };
