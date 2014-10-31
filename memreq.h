@@ -40,8 +40,6 @@ namespace chdl {
 
     node next(_(req, "valid") && _(req, "ready"));
 
-    TAP(next);
-
     vec<N, bvec<B> > d = _(_(req, "contents"), "data");
     bvec<N> wr = bvec<N>(next && _(_(req, "contents"), "wr"))
                    & _(_(req, "contents"), "mask");
