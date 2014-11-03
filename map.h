@@ -54,19 +54,6 @@ template <unsigned SZ, unsigned K, unsigned V>
   dinmap = OrN(dmatch);
   inmap = OrN(match);
 
-  TAP(full);
-  TAP(valid);
-  TAP(match);
-  TAP(dmatch);
-  TAP(b);
-  TAP(dkey);
-  TAP(qkey);
-  TAP(d);
-  TAP(wrsel);
-  TAP(inmap);
-  TAP(dinmap);
-  TAP(wr);
-
   return b;
 }
 
