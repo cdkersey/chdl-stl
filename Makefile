@@ -2,8 +2,8 @@ CHDL_PREFIX ?= /usr/local
 CXXFLAGS = -std=c++11 -g
 LDLIBS = -lchdl
 
-HEADERS = queue.h stack.h map.h initmem.h ag.h net.h counter.h lfsr.h hash.h \
-          bloom.h memreq.h
+HEADERS = queue.h stack.h map.h initmem.h ag.h dir.h net.h counter.h lfsr.h \
+          hash.h bloom.h memreq.h
 TESTS = test-queue test-stack test-map test-initmem test-ag test-net \
         test-counter test-lfsr test-hash test-bloom test-memreq
 TEST_OUT = test-queue.out test-stack.out test-map.out test-initmem.out \
@@ -25,3 +25,4 @@ install:
 
 clean:
 	rm -f *~ $(TESTS) $(TEST_OUT) *.vcd
+
