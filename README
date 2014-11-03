@@ -13,18 +13,24 @@ Contents
     1.1 Aggregate Types
       1.1.1 strtype
       1.1.2 ag
-    1.2 Queue
-    1.3 Stack
-    1.4 Map
-    1.5 Network
-     1.5.1 flit
-     1.5.2 Buffer
-     1.5.3 Arbiter
-     1.5.4 Router
-    1.6 Counter
-    1.7 Linear Feedback Shift Register
-    1.8 Hash functions
-    1.9 Bloom Filter
+    1.2 Directed Types
+      1.1.1 direction_t
+      1.1.2 directed
+      1.1.3 in, out, inout
+      1.1.4 reverse
+      1.1.5 Connect
+    1.3 Queue
+    1.4 Stack
+    1.5 Map
+    1.6 Network
+     1.6.1 flit
+     1.6.2 Buffer
+     1.6.3 Arbiter
+     1.6.4 Router
+    1.7 Counter
+    1.8 Linear Feedback Shift Register
+    1.9 Hash functions
+    1.10 Bloom Filter
   2 Examples
 
 1 API Documentation
@@ -33,12 +39,11 @@ Contents
 1.1 Aggregate Types
 -------------------
 
-It is convenient when using CHDL to bundle together CHDL types into C++ structs
-and classes, so that collections of signals and functions operating on them may
-be passed all of these sinals as a bundle. The downside is that this collection
-of signals cannot then be easily, collectively tapped or operated on by CHDL
-standard library functions without this functionality being added manually for
-each such struct.
+It is convenient to bundle together CHDL types into C++ structs and classes, so 
+that collections of signals and functions operating on them may be passed all of
+these sinals as a bundle. The downside is that this collection of signals cannot
+then be easily, collectively tapped or operated on by CHDL standard library
+functions without this functionality being added manually for each such struct.
 
 C++ does not really provide the level of reflection needed to allow the
 creation of such utility functions as conversions to bvec at compile time for
@@ -98,7 +103,14 @@ Description:
 
   A template that encodes a structured data type as a linked list of types.
 
-1.2 Queue
+1.2 Directed Types
+------------------
+
+Aggregate types, discussed in the previous section, provide a way to combine
+signals together into bundles. This makes it easier to define interfaces, but is
+not sufficient. 
+
+1.3 Queue
 ---------
 
 Description:
@@ -121,7 +133,7 @@ Description:
     sz      - Current number of items in the queue.
     returns - The head of the queue.
 
-1.3 Stack
+1.4 Stack
 ---------
 
 Description:
@@ -144,7 +156,7 @@ Description:
     sz      - Current number of items in the stack.
     returns - The contents of the top of the stack.
 
-1.4 Map
+1.5 Map
 -------
 
 Description:
@@ -168,22 +180,22 @@ Description:
     inmap   - There is an entry with key "qkey".
     returns - The value stored at key "qkey".
 
-1.5 Network
+1.6 Network
 -----------
 
-1.5.1 flit
+1.6.1 flit
 ----------
 
-1.5.2 Buffer
+1.6.2 Buffer
 ------------
 
-1.5.3 Arbiter
+1.6.3 Arbiter
 -------------
 
-1.5.4 Router
+1.6.4 Router
 ------------
 
-1.6 Counter
+1.7 Counter
 -----------
 
 "Counter" exists to add simple stat-gathering counters to any design. These can
@@ -195,7 +207,7 @@ create a CHDL tap, so for example:
 is all that is required to add "counter_x_transitions" to the output .vcd file
 when simulating.
 
-1.7 Linear Feedback Shift Register
+1.8 Linear Feedback Shift Register
 ----------------------------------
 
 Linear feedback shift registers are a well-known inexpensive hardware random
@@ -236,7 +248,7 @@ approximately normal distribution:
     return Zext<8>(l0) + Zext<8>(l1) + Zext<8>(l2) + Zext<8>(l3);
   }
 
-1.8 Hash Functions
+1.9 Hash Functions
 ------------------
 
 A framework for creating simple non-cryptographic hash functions is provided.
@@ -246,7 +258,7 @@ module are available that generate this matrix from a seed value, take this
 matrix as a multidimensional CHDL vec, and that take this matrix as a CHDL vec
 of M unsigned longs.
 
-1.9 Bloom Filter
+1.10 Bloom Filter
 ----------------
 
 Bloom filters take a probabilistic approach to representing sets of objects.
