@@ -3,6 +3,7 @@
 
 #include <chdl/chdl.h>
 #include "ag.h"
+#include "dir.h"
 #include "queue.h"
 
 namespace chdl {
@@ -10,6 +11,14 @@ namespace chdl {
     ag<STP("ready"), node,
     ag<STP("valid"), node,
     ag<STP("contents"), T> > >;
+
+  // Directional flit types for use on module boundaries.
+  template <typename T> using out_flit =
+    ag<STP("ready"), in<node>,
+    ag<STP("valid"), out<node>,
+    ag<STP("contents"), out<T> > > >;
+
+  template <typename T> using in_flit = chdl::reverse<out_flit<T>>;
 
   // Simple buffer with no bypass.
   template <unsigned SZ, typename T> void Buffer(flit<T> &out, flit<T> &in) {

@@ -63,6 +63,26 @@ namespace chdl {
     typedef ag<NAME, inout<T>, typename reverse<NEXT>::type > type;
   };
 
+  // Turn a directed aggregate into an undirected aggregate
+  template <typename T> struct strip_dir
+  { typedef T type; };
+
+  // Strip direction from directed types thmselves
+  template <direction_t D, typename T>
+    struct strip_dir<directed<D, T> >
+  { typedef T type; };
+
+  // Strip direction from aggregate
+  template <typename NAME, typename T, typename NEXT>
+    struct strip_dir<ag<NAME, T, NEXT> >
+  {
+    typedef ag<
+      NAME,
+      typename strip_dir<T>::type,
+      typename strip_dir<NEXT>::type
+    > type;
+  };
+
   // Connect signals in one directed aggregate to those in a complementary
   // directed aggregate.
   template <typename T>
