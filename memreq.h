@@ -43,7 +43,7 @@ namespace chdl {
   template <unsigned B, unsigned N, unsigned A, unsigned I> using out_mem_req =
     out_flit<mem_req_payload<B, N, A, I>>;
 
-  template <unsigned B, unsigned N, unsigned A, unsigned I> using in_mem_resp =
+  template <unsigned B, unsigned N, unsigned I> using in_mem_resp =
     in_flit<mem_resp_payload<B, N, I>>;
 
   template <unsigned B, unsigned N, unsigned I> using out_mem_resp =

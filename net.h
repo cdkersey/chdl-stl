@@ -18,7 +18,8 @@ namespace chdl {
     ag<STP("valid"), out<node>,
     ag<STP("contents"), out<T> > > >;
 
-  template <typename T> using in_flit = chdl::reverse<out_flit<T>>;
+  template <typename T> using in_flit =
+    typename chdl::reverse<out_flit<T>>::type;
 
   // Simple buffer with no bypass.
   template <unsigned SZ, typename T> void Buffer(flit<T> &out, flit<T> &in) {
