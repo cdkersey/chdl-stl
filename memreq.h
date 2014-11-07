@@ -16,10 +16,9 @@ namespace chdl {
       ag<STP("wr"), node,
       ag<STP("mask"), bvec<N>, // Write mask
       ag<STP("addr"), bvec<A>,
-      ag<STP("size"), bvec<chdl::CLOG2(N + 1)>,
       ag<STP("data"), vec<N, chdl::bvec<B> >,
       ag<STP("llsc"), node, // Load linked/store conditional for atomics
-      ag<STP("id"), bvec<I> > > > > > > >;
+      ag<STP("id"), bvec<I> > > > > > >;
 
   // Memory response corresponding to mem_req<B, N, A, I> for any A.
   template <unsigned B, unsigned N, unsigned I> using mem_resp_payload =
