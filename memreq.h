@@ -63,7 +63,7 @@ namespace chdl {
     bvec<A> addr = Latch(!next, _(_(req, "contents"), "addr"));
 
     for (unsigned i = 0; i < N; ++i)
-      _(_(resp, "contents"), "data")[i] = Syncmem(addr, d[i], wr[i]);
+      _(_(resp, "contents"), "data")[i] = Syncmem(Zext<SZ>(addr), d[i], wr[i]);
 
     _(_(resp, "contents"), "wr") = Wreg(next, _(_(req, "contents"), "wr"));
     _(_(resp, "contents"), "id") = Wreg(next, _(_(req, "contents"), "id"));    
