@@ -21,7 +21,7 @@ install:
 	cp $(HEADERS) $(CHDL_PREFIX)/include/chdl/
 
 % : %.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS)$(LDFLAGS)  -o $@ $< $(LDLIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o $@ $< $(LDLIBS)
 
 clean:
 	rm -f *~ $(TESTS) $(TEST_OUT) *.vcd
