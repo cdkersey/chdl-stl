@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++11 -g
 LDLIBS = -lchdl
 
 HEADERS = queue.h stack.h map.h initmem.h ag.h dir.h net.h counter.h lfsr.h \
-          hash.h bloom.h memreq.h
+          hash.h bloom.h memreq.h un.h
 TESTS = test-queue test-stack test-map test-initmem test-ag test-net \
         test-counter test-lfsr test-hash test-bloom test-memreq
 TEST_OUT = test-queue.out test-stack.out test-map.out test-initmem.out \

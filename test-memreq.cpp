@@ -113,6 +113,7 @@ template <unsigned SZ, unsigned T,
     {
       resp_valid = true;
       resp_id = v.id;
+      resp_wr = v.wr;
       if (!v.wr)
         for (unsigned i = 0; i < N; ++i)
           resp_q[i] = v.q[i];

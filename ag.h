@@ -164,6 +164,12 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
     void tap(std::string prefix, const ag<NAME, T, NEXT> &a, bool output=false)
   { a.tap(prefix, output); }
 
+  // Pre-declare these so we can see unions when we tap aggregates containing
+  // them.
+  template <typename NAME, typename T, typename NEXT> struct un;
+  template <typename NAME, typename T, typename NEXT>
+    void tap(std::string prefix, const un<NAME, T, NEXT> &a, bool output=false);
+
   template<typename NAME, typename T, typename NEXT>
     void ag<NAME, T, NEXT>::tap(std::string prefix, bool output) const
   {
