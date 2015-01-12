@@ -1,4 +1,6 @@
 _ Write test-un.cpp
+_ Write a full tests for numeric, instead of just providing test vectors and not
+  testing the result.
 _ Document network.h
 _ Document memreq.h
 _ Move the random delay memory to some permanent library somewhere.
