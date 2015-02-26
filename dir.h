@@ -88,11 +88,30 @@ namespace chdl {
   template <typename T>
     void Connect(T &x, T &y) {} // base
 
+  // In case the top level is undirected but lower levels are.
   template <typename NAME, typename T, typename NEXT>
     void Connect(ag<NAME, T, NEXT> &x,
                  typename chdl::reverse<ag<NAME, T, NEXT> >::type &y)
   {
+    Connect(x.contents, y.contents);
+
+    Connect(x.next, y.next);
+  }
+  
+  template <typename NAME, typename T, typename NEXT>
+    void Connect(ag<NAME, in<T>, NEXT> &x,
+                 typename chdl::reverse<ag<NAME, in<T>, NEXT> >::type &y)
+  {
     x.contents = y.contents;
+
+    Connect(x.next, y.next);
+  }
+
+  template <typename NAME, typename T, typename NEXT>
+    void Connect(ag<NAME, out<T>, NEXT> &x,
+                 typename chdl::reverse<ag<NAME, out<T>, NEXT> >::type &y)
+  {
+    y.contents = x.contents;
 
     Connect(x.next, y.next);
   }
