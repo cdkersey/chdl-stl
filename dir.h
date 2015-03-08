@@ -29,6 +29,27 @@ namespace chdl {
   template <typename T> using out = directed<DIR_OUT, T>;
   template <typename T> using inout = directed<DIR_INOUT, T>;
 
+  // Strip direction from a directed aggregate
+  template <typename T> struct undir { typedef T type; }; // Base
+
+  template <typename NAME, typename T, typename NEXT> // strip in
+    struct undir<ag<NAME, in<T>, NEXT> >
+  {
+    typedef ag<NAME, typename undir<T>::type, typename undir<NEXT>::type> type;
+  };
+
+  template <typename NAME, typename T, typename NEXT> // strip out
+    struct undir<ag<NAME, out<T>, NEXT> >
+  {
+    typedef ag<NAME, typename undir<T>::type, typename undir<NEXT>::type> type;
+  };
+
+  template <typename NAME, typename T, typename NEXT> // strip inout
+    struct undir<ag<NAME, inout<T>, NEXT> >
+  {
+    typedef ag<NAME, typename undir<T>::type, typename undir<NEXT>::type> type;
+  };
+  
   // Reverse a directed aggregate
   template <typename T> struct reverse { typedef T type; }; // Base
 
@@ -82,7 +103,7 @@ namespace chdl {
       typename strip_dir<NEXT>::type
     > type;
   };
-
+  
   // Connect signals in one directed aggregate to those in a complementary
   // directed aggregate.
   template <typename T>
@@ -115,6 +136,39 @@ namespace chdl {
 
     Connect(x.next, y.next);
   }
+
+  template <typename NAME, typename T, typename NEXT>
+    void Connect(ag<NAME, out<T>, NEXT> &x,
+                 typename chdl::ag<NAME, T, typename undir<NEXT>::type> &y)
+  {
+    y.contents = x.contents;
+    Connect(x.next, y.next);
+  }
+
+  template <typename NAME, typename T, typename NEXT>
+    void Connect(typename chdl::ag<NAME, T, typename undir<NEXT>::type> &x,
+                 ag<NAME, out<T>, NEXT> &y)
+  {
+    x.contents = y.contents;
+    Connect(x.next, y.next);
+  }
+
+  template <typename NAME, typename T, typename NEXT>
+    void Connect(ag<NAME, in<T>, NEXT> &x,
+                 typename chdl::ag<NAME, T, typename undir<NEXT>::type> &y)
+  {
+    x.contents = y.contents;
+    Connect(x.next, y.next);
+  }
+
+  template <typename NAME, typename T, typename NEXT>
+    void Connect(typename chdl::ag<NAME, T, typename undir<NEXT>::type> &x,
+                 ag<NAME, in<T>, NEXT> &y)
+  {
+    y.contents = x.contents;
+    Connect(x.next, y.next);
+  }
+  
 }
 
 #endif
