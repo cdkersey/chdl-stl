@@ -48,6 +48,19 @@ namespace chdl {
   template <unsigned B, unsigned N, unsigned I> using out_mem_resp =
     out_flit<mem_resp_payload<B, N, I>>;
 
+  // Directed and undirected ports; both the req and the resp!
+  template <unsigned B, unsigned N, unsigned A, unsigned I> using mem_port =
+    ag<STP("req"), mem_req<B, N, A, I>,
+    ag<STP("resp"), mem_resp<B, N, I> > >;
+
+  template <unsigned B, unsigned N, unsigned A, unsigned I> using out_mem_port =
+    ag<STP("req"), out_mem_req<B, N, A, I>,
+    ag<STP("resp"), in_mem_resp<B, N, I> > >;
+
+  template <unsigned B, unsigned N, unsigned A, unsigned I> using in_mem_port =
+    ag<STP("req"), in_mem_req<B, N, A, I>,
+    ag<STP("resp"), out_mem_resp<B, N, I> > >;
+
   // A very basic 1-cycle latency SRAM using the mem_req interface. Addresses
   // are truncated.
   template<unsigned SZ, unsigned B, unsigned N, unsigned A, unsigned I>
