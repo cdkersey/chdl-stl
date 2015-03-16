@@ -200,7 +200,7 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
 
   template <typename QNAME, typename NAME, typename T, typename NEXT>
     typename match_type<QNAME, ag<NAME, T, NEXT> >::type
-      Lookup(ag<NAME, T, NEXT> a)
+      &Lookup(ag<NAME, T, NEXT> a)
   {
     return lookup<QNAME, NAME, T, NEXT>(a).value;
   }
