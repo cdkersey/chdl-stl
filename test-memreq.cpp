@@ -131,8 +131,8 @@ template<unsigned SZ, unsigned T,
   new random_delay_mem<SZ,T,B,N,A,I>(resp, req);
 }
 
-template <unsigned B, unsigned N, unsigned A, unsigned I, typename T>
-  bool test_Memreq(const T &MemUnit)
+template <unsigned B, unsigned N, unsigned A, unsigned I>
+  bool test_Memreq(void (*MemUnit)(mem_resp<B, N, I>&, mem_req<B, N, A, I>&))
 {
   srand(0);
 

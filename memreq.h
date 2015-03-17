@@ -89,5 +89,9 @@ namespace chdl {
       ELSE(valid);
   }
 
+  template<unsigned SZ, unsigned B, unsigned N, unsigned A, unsigned I>
+    void Scratchpad(mem_port<B, N, A, I> &port)
+  { Scratchpad<SZ>(_(port, "resp"), _(port, "req")); }
+
 };
 #endif
