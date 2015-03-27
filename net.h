@@ -21,6 +21,13 @@ namespace chdl {
   template <typename T> using in_flit =
     typename chdl::reverse<out_flit<T>>::type;
 
+
+  // "Connect" function for undirected flits
+  template <typename T> void Connect(flit<T> &out, flit<T> &in) {
+    _(in, "ready") = _(out, "ready");
+    _(out, "valid") = _(in, "valid");
+    _(out, "contents") = _(in, "contents");   
+  }
   // Simple buffer with no bypass.
   template <unsigned SZ, typename T> void Buffer(flit<T> &out, flit<T> &in) {
     HIERARCHY_ENTER();
