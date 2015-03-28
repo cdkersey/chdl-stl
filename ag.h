@@ -77,7 +77,9 @@ template <unsigned N> constexpr char _xt(const char (&s)[N], unsigned i) {
   >::X >::X >::X >::X >::X >::X >::X >::X \
   >::X >::X >::X >::X >::X >::X >::X >::X
 
+#ifndef CHDL_AG_DISABLE_STP
 #define STP(x) STRTYPE(x)
+#endif
 
 struct ag_endtype {
   void tap(std::string prefix, bool output = false) const {}

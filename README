@@ -90,6 +90,10 @@ Of course, this is a potentially contentuous macro name, and in the event of a
 conflict, it can be disabled by defining CHDL_AG_DISABLE_UNDERSCORE before
 including ag.h.
 
+An abbreviation also exists for STRTYPE(); if not explicitly disabled by having
+defined the CHDL_AG_DISABLE_STP macro when ag.h is included, STP() can be used
+instead, making declarations of aggregates somewhat more compact.
+
 1.1.1 strtype<C, NEXT>
 ----------------------
 
