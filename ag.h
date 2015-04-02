@@ -94,7 +94,9 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
 {
   ag() {}
 
-  ag(const ag &r): contents(r.contents), next(r.next) {}
+  ag(const ag &r): contents(r.contents), next(r.next) {
+    std::cout << "Copy ag " << &r << " -> " << this << std::endl;
+  }
 
   ag(const bvec<sz<T>::value + sz<NEXT>::value> &r)
   {
@@ -201,11 +203,35 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
   };
 
   template <typename QNAME, typename NAME, typename T, typename NEXT>
-    typename match_type<QNAME, ag<NAME, T, NEXT> >::type
-      &Lookup(ag<NAME, T, NEXT> a)
+    struct constlookup
   {
-    return lookup<QNAME, NAME, T, NEXT>(a).value;
-  }
+  constlookup(const ag<NAME, T, NEXT> &a):
+    value(constlookup<
+      QNAME,
+      typename ag<NAME, T, NEXT>::next_t::name_t,
+      typename ag<NAME, T, NEXT>::next_t::content_t,
+      typename ag<NAME, T, NEXT>::next_t::next_t
+    >(a.next).value) {}
+
+    const typename match_type<QNAME, ag<NAME, T, NEXT> >::type &value;
+  };
+
+  template <typename NAME, typename T, typename NEXT>
+    struct constlookup<NAME, NAME, T, NEXT>
+  {
+    constlookup(const ag<NAME, T, NEXT> &a): value(a.contents) {}
+    const T &value;
+  };
+
+  template <typename QNAME, typename NAME, typename T, typename NEXT>
+    typename match_type<QNAME, ag<NAME, T, NEXT> >::type
+      &Lookup(ag<NAME, T, NEXT> &a)
+  { return lookup<QNAME, NAME, T, NEXT>(a).value; }
+
+  template <typename QNAME, typename NAME, typename T, typename NEXT>
+    const typename match_type<QNAME, ag<NAME, T, NEXT> >::type
+      &Lookup(const ag<NAME, T, NEXT> &a)
+  { return constlookup<QNAME, NAME, T, NEXT>(a).value; }
 
 #ifndef CHDL_AG_DISABLE_UNDERSCORE
 #define _(ag, name) Lookup<STRTYPE(name)>(ag)
