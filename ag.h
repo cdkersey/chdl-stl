@@ -94,9 +94,7 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
 {
   ag() {}
 
-  ag(const ag &r): contents(r.contents), next(r.next) {
-    std::cout << "Copy ag " << &r << " -> " << this << std::endl;
-  }
+  ag(const ag &r): contents(r.contents), next(r.next) {}
 
   ag(const bvec<sz<T>::value + sz<NEXT>::value> &r)
   {
