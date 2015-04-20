@@ -22,8 +22,9 @@ namespace chdl {
     stages[0] = Wreg(advance, stages[M], SEED);
     for (unsigned i = 1; i < M + 1; ++i)
       stages[i] = LfsrStage<N, TAP>(stages[i-1]);
-    return stages[M][range<0, M-1>()];
+    bvec<M> r = stages[M][range<0, M-1>()];
     HIERARCHY_EXIT();
+    return r;
   }
 
   template <unsigned M, unsigned N, unsigned TAP>
@@ -34,8 +35,9 @@ namespace chdl {
     stages[0] = Wreg(advance, stages[M], seed);
     for (unsigned i = 1; i < M + 1; ++i)
       stages[i] = LfsrStage<N, TAP>(stages[i-1]);
-    return stages[M][range<0, M-1>()];
+    bvec<M> r =  stages[M][range<0, M-1>()];
     HIERARCHY_EXIT();
+    return r;
   }
 }
 
