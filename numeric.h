@@ -81,6 +81,15 @@ namespace chdl {
     return bvec<N>(a) == bvec<N>(b);
   }
 
+  template <unsigned N> si<N> operator/(const si<N> &a, const si<N> &b) {
+    node a_neg(a[N-1]), b_neg(b[N-1]), o_neg(a_neg != b_neg);
+
+    si<N> q(Mux(a_neg, bvec<N>(a), bvec<N>(-a)) /
+            Mux(b_neg, bvec<N>(b), bvec<N>(-b)));
+ 
+    return Mux(o_neg, bvec<N>(q), bvec<N>(-q));
+  }
+
   // Signal an overflow if second param can't fit into the first param
   template <unsigned M, unsigned N> node Overflow(si<M>&, si<N> &x) {
     node allOne(!OrN(~x[range<M-1, N-1>()])),
@@ -448,6 +457,15 @@ namespace chdl {
   {
     bvec<2*(W+F)> ax(Sext<2*(W+F)>(a)), bx(Sext<2*(W+F)>(b));
     return fxp<W, F>((ax * bx)[range<F, 2*F+W-1>()]);
+  }
+
+  template <unsigned W, unsigned F>
+    fxp<W, F> operator/(const fxp<W, F> &a, const fxp<W, F> &b)
+  {
+    bvec<W + F> av(a), bv(b);
+    si<W + 2*F> ax(Cat(av, Lit<F>(0))), bx(Zext<W + 2*F>(bv));
+    si<W + F> q(Zext<W + F>(ax / bx));
+    return fxp<W, F>(q);
   }
 }
 
