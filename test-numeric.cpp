@@ -63,11 +63,16 @@ template <typename T> void test_add() {
   TestFunc<T>([](const T &a, const T& b) { return a + b; });
 }
 
+template <typename T> void test_div() {
+  TestFunc<T>([](const T &a, const T& b) { return a / b; });
+}
+
 int main(int argc, char** argv) {
   test_add<fp16      >(); reset();
   test_add<fp32      >(); reset();
   test_add<fp64      >(); reset();
   test_add<fxp<7,7>  >(); reset();
+  test_div<fxp<7,7>  >(); reset();
   test_add<fxp<13,13>>(); reset();
   test_add<fxp<8,24> >(); reset();
   test_add<si<5>     >(); reset();
