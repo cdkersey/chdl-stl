@@ -3,4 +3,5 @@ _ Write a full tests for numeric, instead of just providing test vectors and not
   testing the result.
 _ Document network.h
 _ Document memreq.h
+_ Test the new memreq.h features
 _ Move the random delay memory to some permanent library somewhere.
