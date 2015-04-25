@@ -271,9 +271,14 @@ namespace chdl {
   //   req1, resp1 -- larger req/resp pair, toward memory
   template <unsigned B0, unsigned N0, unsigned A0, unsigned I,
             unsigned B1, unsigned N1, unsigned A1>
-    void SizeAdaptor(mem_req<B1, N1, A1, I> &req1, mem_resp<B1, N1, I> &resp1,
-                     mem_req<B0, N0, A0, I> &req0, mem_resp<B0, N0, I> &resp0)
+    void SizeAdaptor(mem_req<B1, N1, A1, I> &req1,
+                     mem_resp<B1, N1, I> &resp1,
+                     mem_req<B0, N0, A0, I> &req0,
+                     mem_resp<B0, N0, I> &resp0_buf)
   {
+    mem_resp<B0, N0, I> resp0;
+    Buffer<1>(resp0_buf, resp0);
+  
     const unsigned M(N1*B1 / (N0*B0)), // Number of req0 words in the line
                    MM(CLOG2(M)); // Number of bits to address a line in M
 
