@@ -197,6 +197,7 @@ namespace chdl {
     _(_(_(out,"req"),"contents"),"wr") = _(_(req,"contents"),"wr");
     _(_(_(out,"req"),"contents"),"mask") = _(_(req,"contents"),"mask");
 
+    _(_(out, "resp"), "ready") = _(_(in, "resp"), "ready");
     _(_(in,"resp"),"valid") = _(resp,"valid");;
     _(_(_(in,"resp"),"contents"),"id") = _(_(resp,"contents"),"id");
     _(_(_(in,"resp"),"contents"),"data") = _(_(resp,"contents"),"data");
