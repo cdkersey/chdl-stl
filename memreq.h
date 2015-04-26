@@ -120,6 +120,8 @@ namespace chdl {
     bvec<SZ> addr(Zext<SZ>(_(_(req, "contents"), "addr")));
     Flatten(_(_(resp, "contents"), "data")) =
       Wreg(read, LLRom<SZ, B*N>(addr, filename));
+
+    _(_(resp, "contents"), "id") = Wreg(read, _(_(req, "contents"), "id"));
   }
 
   template <unsigned SZ, unsigned B, unsigned N, unsigned A, unsigned I>
