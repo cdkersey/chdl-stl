@@ -209,11 +209,13 @@ namespace chdl {
   }
 
   // Add a fixed "tag" to IDs in memory requests, strip it from responses.
-  template <unsigned T, unsigned B, unsigned N, unsigned A, unsigned I>
-    void TagID(mem_port<B, N, A, I + T> &out, mem_port<B, N, A, I> &in, int t)
+  template <unsigned B, unsigned N, unsigned A, unsigned I, unsigned J>
+    void TagID(mem_port<B, N, A, J> &out, mem_port<B, N, A, I> &in, int t)
   {
+    const unsigned T(J - I);
+
     mem_req<B, N, A, I> req; Connect(req, _(in, "req"));
-    mem_resp<B, N, I + T> resp; Connect(resp, _(out, "resp"));
+    mem_resp<B, N, J> resp; Connect(resp, _(out, "resp"));
 
     bvec<T> tag(Lit<T>(t)),
             resp_tag(_(_(resp, "contents"), "id")[range<I, I+T-1>()]);
