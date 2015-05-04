@@ -260,7 +260,7 @@ namespace chdl {
 	      _(_(out,"resp"),"valid"))
     );
     for (unsigned t = 0; t < M; ++t) {
-      TagID<CLOG2(M)>(in_tagged[t], in[t], t);
+      TagID(in_tagged[t], in[t], t);
       Connect(in_tagged_reqs[t],_(in_tagged[t], "req"));
       Connect(_(in_tagged[t],"resp"),resps[t]);
     }
