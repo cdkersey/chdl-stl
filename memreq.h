@@ -133,7 +133,7 @@ namespace chdl {
   template <unsigned B, unsigned N, unsigned A, unsigned I>
     void SplitBytes(mem_port<B, N, A, I> &out, mem_port<B*N, 1, A, I> &in)
   {
-    mem_req<B, N, A, I> &req(_(in, "req"));
+    mem_req<B*N, 1, A, I> &req(_(in, "req"));
     mem_resp<B, N, I> &resp(_(out, "resp"));
     
     _(_(in, "req"),"ready") = _(_(out,"req"),"ready");
