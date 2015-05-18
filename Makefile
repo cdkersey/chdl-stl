@@ -1,4 +1,4 @@
-CHDL_PREFIX ?= /usr/local
+PREFIX ?= /usr/local
 CXXFLAGS = -std=c++11 -g
 LDLIBS = -lchdl
 
@@ -18,11 +18,10 @@ test : $(TEST_OUT)
 	./$< > $@
 
 install:
-	cp $(HEADERS) $(CHDL_PREFIX)/include/chdl/
+	cp $(HEADERS) $(PREFIX)/include/chdl/
 
 % : %.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o $@ $< $(LDLIBS)
 
 clean:
 	rm -f *~ $(TESTS) $(TEST_OUT) *.vcd
-
