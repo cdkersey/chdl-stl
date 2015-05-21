@@ -18,6 +18,7 @@ test : $(TEST_OUT)
 	./$< > $@
 
 install:
+	mkdir -p $(PREFIX)/include/chdl
 	cp $(HEADERS) $(PREFIX)/include/chdl/
 
 % : %.cpp $(HEADERS)
