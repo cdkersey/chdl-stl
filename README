@@ -32,6 +32,7 @@ Contents
     1.9 Linear Feedback Shift Register
     1.10 Hash functions
     1.11 Bloom Filter
+    1.12 Sort
   2 Examples
 
 1 API Documentation
@@ -298,5 +299,26 @@ Description:
   Outputs:
     returns - 1 for hit (0-cycle latency)
 
+1.12 Sort
+---------
+
+Description:
+
+  Combinationally sort N (must be a power of 2) elements in O(log^2(N)) logic
+  layers and O(N*log^2(N)) gates. Employes an odd/even merge sort network.
+
+  template <unsigned N, typename T>
+    vec<N, T> Sort(const vec<N, T> &x);
+
+  Template Parameters:
+    N - Number of objects in input/output vectors.
+    T - Type of input and output vectors. Must have a less-than operator.
+
+  Inputs:
+    x - N-element vector of objects with a less-than operator.
+
+  Outputs:
+    returns - The elements in x, sorted.
+  
 2 Examples
 ----------
