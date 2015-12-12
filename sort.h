@@ -6,7 +6,7 @@
 namespace chdl {
   namespace sort_internal {
     template <typename T> void Compare(T &ao, T &bo, const T &a, const T &b) {
-      node swap(a > b);
+      node swap(b < a);
 
       ao = Mux(swap, a, b);
       bo = Mux(swap, b, a);
