@@ -4,20 +4,6 @@
 #include <chdl/chdl.h>
 #include <chdl/ag.h>
 
-// This shold wind up in the README:
-//
-// We do automatic conversion from other bit widths. It's not always easy to
-// predict the bit widths of your result, so we provide this for convenience
-// despite the fact that it can lead to unintentional overflow errors. We
-// hope auto variables and TooBig() will be used when this may be an issue.
-//
-// At some point, we need to introduce signed integer types and maybe even
-// some 1-hot other radix types so we can get beyond our idiotic insistence
-// that everything be either an unsigned integer or hard-to-do. Here's a
-// first attempt, a 2's complement signed integral type. Note that the output
-// types are all large enough to hold any result, so that overflow detection
-// can be done reasonably, but only if required, using the TooBig() function.
-
 namespace chdl {
   template <unsigned N> struct ui : public bvec<N> {
     template <unsigned M> ui(const ui<M> &x): bvec<N>(Zext<N>(x)) {}
