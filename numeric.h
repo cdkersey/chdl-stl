@@ -2,7 +2,7 @@
 #define CHDL_NUMERIC_H
 
 #include <chdl/chdl.h>
-#include <chdl/ag.h>
+#include "ag.h"
 
 namespace chdl {
   template <unsigned N> struct ui : public bvec<N> {
