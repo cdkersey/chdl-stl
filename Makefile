@@ -1,6 +1,6 @@
 PREFIX ?= /usr/local
 CXXFLAGS = -std=c++11 -g
-LDLIBS = -lchdl
+LDLIBS = -pthread -lchdl
 
 HEADERS = queue.h stack.h map.h initmem.h ag.h dir.h net.h counter.h lfsr.h \
           hash.h bloom.h memreq.h un.h numeric.h sort.h
