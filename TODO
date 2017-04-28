@@ -1,3 +1,8 @@
+Bugs
+
+_ Tests requiring 0-initialized SRAM fail.
+
+Features
 _ Write test-un.cpp
 _ Write a full tests for numeric, instead of just providing test vectors and not
   testing the result.
