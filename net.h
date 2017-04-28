@@ -29,7 +29,9 @@ namespace chdl {
   }
 
   // Simple buffer with no bypass.
-  template <unsigned SZ, typename T> void Buffer(flit<T> &out, flit<T> &in) {
+  template <unsigned SZ, typename T, bool SRAM>
+    void BufferBase(flit<T> &out, flit<T> &in)
+  {
     HIERARCHY_ENTER();
 
     bvec<SZ + 1> occupancy_x, occupancy(Reg(occupancy_x));
@@ -45,9 +47,21 @@ namespace chdl {
     bvec<sz<T>::value> in_vec(Flatten(_(in, "contents"))),
                        out_vec(Flatten(_(out, "contents")));
 
-    out_vec = SyncQueue<SZ>(in_vec, push, pop, occupancy_x);
+    if (SRAM) {
+      out_vec = SyncQueue<SZ>(in_vec, push, pop, occupancy_x);
+    } else {
+      out_vec = Reg(Queue<SZ>(in_vec, push, pop, occupancy_x));
+    }
 
     HIERARCHY_EXIT();
+  }
+
+  template <unsigned SZ, typename T> void Buffer(flit<T> &out, flit<T> &in) {
+    BufferBase<SZ, T, true>(out, in);
+  }
+
+  template <unsigned SZ, typename T> void RegBuffer(flit<T> &out, flit<T> &in)   {
+    BufferBase<SZ, T, false>(out, in);
   }
 
   template <unsigned N, typename T, typename F>
