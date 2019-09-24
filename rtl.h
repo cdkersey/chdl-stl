@@ -116,6 +116,62 @@ template <typename T> struct rtl_reg : public T {
     return r;
   }
 
+  T operator++(int) { *this = *this + Lit<sz<T>::value>(1); return *this; }
+  T operator++() { T x = *this + Lit<sz<T>::value>(1); *this = x; return x; }
+  T operator--(int) { *this = *this - Lit<sz<T>::value>(1); return *this; }
+  T operator--() { T x = *this - Lit<sz<T>::value>(1); *this = x; return x; }
+  T operator+=(const T &x) { return (*this = *this + x); }
+  T operator-=(const T &x) { return (*this = *this - x); }
+  T operator*=(const T &x) { return (*this = *this * x); }
+  T operator/=(const T &x) { return (*this = *this / x); }
+  T operator%=(const T &x) { return (*this = *this % x); }
+  T operator&=(const T &x) { return (*this = *this & x); }
+  T operator|=(const T &x) { return (*this = *this | x); }
+  T operator^=(const T &x) { return (*this = *this ^ x); }
+  template <typename U>
+    T operator<<=(const U &x) { return (*this = *this << x); }
+  template <typename U>
+    T operator>>=(const U &x) { return (*this = *this >> x); }
+
+  template <typename U, unsigned M>
+    U assign_idx(bvec<M> idx, const U &x)
+  {
+    *this = Repl(T(*this), idx, x);
+    return x;
+  }
+
+  template <unsigned M> rtl_assigner<T, M> operator[](bvec<M> idx) {
+    return rtl_assigner<T, M>(*this, idx);
+  }
+
+  template <typename U> auto operator[](const U& idx)
+  {
+    return ((T)*this)[idx];
+  }
+  
+  int sources;
+  bvec<MAX_RTL> preds;
+  vec<MAX_RTL, T> src;
+  T initial;
+};
+
+template <typename T> struct rtl_wire : public T {
+  rtl_wire(): sources(0) {}
+
+  ~rtl_wire() {
+    T(*this) = Mux1Hot(preds, src);
+  }
+  
+  T operator=(const T& r) {
+    if (rtl_pred_stack.empty()) preds[sources] = Lit(1);
+    else                        preds[sources] = *rtl_pred_stack.top();
+    src[sources] = r;
+    ++sources;
+
+    return r;
+  }
+
+#if 0
   T operator+=(const T &x) { return (*this = *this + x); }
   T operator-=(const T &x) { return (*this = *this - x); }
   T operator*=(const T &x) { return (*this = *this * x); }
@@ -136,10 +192,7 @@ template <typename T> struct rtl_reg : public T {
     *this = Repl(T(*this), idx, x);
     return x;
   }
-
-  template <unsigned M> rtl_assigner<T, M> operator[](bvec<M> idx) {
-    return rtl_assigner<T, M>(*this, idx);
-  }
+#endif
 
   int sources;
   bvec<MAX_RTL> preds;
