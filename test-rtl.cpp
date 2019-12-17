@@ -24,11 +24,14 @@ bool test_rtl() {
     rtl_reg<bvec<NN> > i(Lit<NN>(2)), j;
     rtl_reg<node> init(Lit(1)), find, mark, readout;
 
+    rtl_wire<node> console_valid;
+    rtl_wire<bvec<32> > console_data;
+
     IF(init) {
       IF(i == Lit<NN>(N)) {
         i = Lit<NN>(2); init = Lit(0);  find = Lit(1);
       } ELSE {
-        a[Zext<CLOG2(N)>(i)] = Lit(1);  i += Lit<NN>(1);
+        a[Zext<CLOG2(N)>(i)] = Lit(1);  i++;
       } ENDIF;
     } ELIF(find) {
       IF(i * i >= Lit<NN>(N)) {
@@ -36,11 +39,11 @@ bool test_rtl() {
       } ELIF(Mux(Zext<CLOG2(N)>(i), a)) {
         find = Lit(0);  mark = Lit(1);  j = i * i;
       } ELSE {
-        i += Lit<NN>(1);
+        i++;
       } ENDIF;
     } ELIF(mark) {
       IF(j >= Lit<NN>(N)); {
-        i += Lit<NN>(1);  find = Lit(1);  mark = Lit(0);
+        i++;  find = Lit(1);  mark = Lit(0);
       } ELSE {
         a[Zext<CLOG2(N)>(j)] = Lit(0);  j += i;
       } ENDIF;
@@ -48,11 +51,13 @@ bool test_rtl() {
       IF(i == Lit<NN>(N)) {
 	readout = Lit(0);
       } ELSE {
-        i += Lit<NN>(1);
+        i++;
+	console_valid = Mux(Zext<CLOG2(N)>(i), a);
+	console_data = Zext<32>(i);
       } ENDIF;
     } ENDIF;
 
-    NumConsole(Zext<32>(i), readout && Mux(Zext<CLOG2(N)>(i), a));
+    NumConsole(console_data, console_valid);
 
     TAP(i); TAP(j); TAP(mark); TAP(readout); TAP(a); TAP(init); TAP(find);
   }
