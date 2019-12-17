@@ -16,6 +16,14 @@ using namespace std;
 
 const unsigned MAX_BR(128);
 
+void NumConsole(bvec<32> x, node valid) {
+  unsigned int *p = new unsigned int(0);
+  EgressInt(*p, x);
+  EgressFunc([=](bool v) {
+    if (v) cout << *p << endl;
+  }, valid, false);
+}
+
 template <unsigned N> void demo() {
   const unsigned NN(CLOG2(2*N + 2));
   var<bvec<NN> > i, j;
@@ -27,10 +35,16 @@ template <unsigned N> void demo() {
   });
 
   FOR(i = Lit<NN>(2), i < Lit<NN>(sqrt(N)), i = i + Lit<NN>(1), {
-      IF(Mux(Zext<CLOG2(N)>(bvec<NN>(i)), bvec<N>(a)), {
+    IF(Mux(Zext<CLOG2(N)>(bvec<NN>(i)), bvec<N>(a)), {
       FOR(j = i * i, j < Lit<NN>(N), j = j + bvec<NN>(i), {
         a = bvec<N>(a) & ~(Lit<N>(1) << Zext<CLOG2(N)>(bvec<NN>(j)));
       });
+    });
+  });
+
+  FOR(i = Lit<NN>(2), i < Lit<NN>(N), i = i + Lit<NN>(1), {
+    IF(Mux(Zext<CLOG2(N)>(bvec<NN>(i)), bvec<N>(a)), {
+      NumConsole(Zext<32>(bvec<NN>(i)), alg_st()->in_cur());
     });
   });
 

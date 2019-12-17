@@ -173,6 +173,18 @@ template <typename T> void tap(std::string name, const var<T> &x) {
 
 #ifdef CHDL_ALG_MACROS
 
+#define LABEL(str) do { \
+  alg_st()->label(str); \
+} while(0)
+
+#define GOTO(str) do { \
+  alg_st()->br(str, Lit(1)); \
+} while(0)
+
+#define BR(cond, str) do { \
+  alg_st()->br((str), (cond)); \
+} while(0)
+
 #define WHILE(x, y) { \
   std::string __clabel = alg_st()->lname(); \
   alg_st()->br(__clabel, !(x)); \
@@ -193,6 +205,7 @@ template <typename T> void tap(std::string name, const var<T> &x) {
 #define IF(x, y) {\
   std::string __clabel = alg_st()->lname();\
   alg_st()->br(__clabel, !(x));\
+  alg_st()->label();\
   y\
   alg_st()->label(__clabel);\
 }
