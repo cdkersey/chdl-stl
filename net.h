@@ -74,7 +74,7 @@ namespace chdl {
     for (unsigned i = 0; i < N; ++i) {
       valid[i] = _(in[i], "valid");
       _(in[i], "ready") = ready[i];
-      invec[i] = _(in[i], "contents");
+      invec[i] = Flatten(_(in[i], "contents"));
     }
 
     bvec<CLOG2(N)> sel;
@@ -82,7 +82,7 @@ namespace chdl {
     ready = Decoder(sel, _(out, "ready"));
 
     _(out, "valid") = OrN(ready & valid);
-    _(out, "contents") = Mux(sel, invec);
+    Flatten(_(out, "contents")) = Mux(sel, invec);
 
     HIERARCHY_EXIT();
   }

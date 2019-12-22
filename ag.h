@@ -102,7 +102,7 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
     bv = r;
   }
 
-  ag &operator=(ag &r) { contents = r.contents; next = r.next; }
+  ag &operator=(ag &r) { contents = r.contents; next = r.next; return *this; }
 
   // Identical to bvec-based constructor.
   ag &operator=(const bvec<sz<T>::value + sz<NEXT>::value> &r)
