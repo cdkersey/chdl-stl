@@ -165,10 +165,10 @@ namespace chdl {
   }
 
   // Literal functions for the common types.
-  fp16  LitF16 (double d) { return LitF< 5, 10>(d); }
-  fp32  LitF32 (double d) { return LitF< 8, 23>(d); }
-  fp64  LitF64 (double d) { return LitF<11, 52>(d); }
-  fp128 LitF128(double d) { return LitF<15,112>(d); }
+  static fp16  LitF16 (double d) { return LitF< 5, 10>(d); }
+  static fp32  LitF32 (double d) { return LitF< 8, 23>(d); }
+  static fp64  LitF64 (double d) { return LitF<11, 52>(d); }
+  static fp128 LitF128(double d) { return LitF<15,112>(d); }
 
   // Type-inferring overloadedliteral function
   template <unsigned E, unsigned M> void Lit(fp<E, M> f, double d) {
