@@ -109,6 +109,7 @@ template <typename NAME, typename T, typename NEXT = ag_endtype>
   {
     bvec<sz<T>::value + sz<NEXT>::value> bv(*this);
     bv = r;
+    return *this;
   }
 
   operator bvec<sz<T>::value + sz<NEXT>::value>() const {
