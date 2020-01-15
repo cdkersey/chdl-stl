@@ -14,8 +14,6 @@
 using namespace chdl;
 using namespace std;
 
-const unsigned MAX_BR(128);
-
 void NumConsole(bvec<32> x, node valid) {
   unsigned int *p = new unsigned int(0);
   EgressInt(*p, x);

@@ -114,6 +114,12 @@ template <typename T> struct var {
     return T(*this);
   }
 
+  T operator=(var<T> x) {
+    return ((*this) = T(x));
+  }
+
+
+
   int cur;
 
   bvec<sz<T>::value> val, next, reg;
