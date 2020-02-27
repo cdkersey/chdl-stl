@@ -116,6 +116,11 @@ template <typename T> struct rtl_reg : public T {
     return r;
   }
 
+  T operator=(const rtl_reg<T>& r) {
+    *this = (T)r;
+    return (T)*this;
+  }
+
   T operator++(int) { *this = *this + Lit<sz<T>::value>(1); return *this; }
   T operator++() { T x = *this + Lit<sz<T>::value>(1); *this = x; return x; }
   T operator--(int) { *this = *this - Lit<sz<T>::value>(1); return *this; }
