@@ -21,7 +21,7 @@ bool test_rtl() {
   { const unsigned N(250), NN(2*CLOG2(N + 1));
 
     rtl_reg<bvec<N> > a;
-    rtl_reg<bvec<NN> > i(Lit<NN>(2)), j;
+    rtl_reg<bvec<NN> > i(Lit<NN>(2)), j, z(Lit<NN>(0));
     rtl_reg<node> init(Lit(1)), find, mark, readout;
 
     rtl_wire<node> console_valid;
@@ -35,7 +35,7 @@ bool test_rtl() {
       } ENDIF;
     } ELIF(find) {
       IF(i * i >= Lit<NN>(N)) {
-        i = Lit<NN>(0); find = Lit(0); readout = Lit(1);
+        i = z; find = Lit(0); readout = Lit(1);
       } ELIF(Mux(Zext<CLOG2(N)>(i), a)) {
         find = Lit(0);  mark = Lit(1);  j = i * i;
       } ELSE {
@@ -60,6 +60,7 @@ bool test_rtl() {
     NumConsole(console_data, console_valid);
 
     TAP(i); TAP(j); TAP(mark); TAP(readout); TAP(a); TAP(init); TAP(find);
+    TAP(z);
   }
 
   optimize();
