@@ -9,10 +9,15 @@
 namespace chdl {
 const unsigned MAX_RTL = 64;
 
-node Reg(node d, node init) {
-  return Reg(d, nodes[(nodeid_t)init]->eval(0));
-}
+extern std::stack<node *> rtl_pred_stack, rtl_prev_stack;
 
+node Reg(node d, node init);
+void rtl_end();
+void rtl_if(node x);
+void rtl_elif(node x);
+void rtl_else();
+void tap_pred(std::string name);
+  
 template <typename T> T Reg(const T& d, const T &init) {
   bvec<sz<T>::value> qv, dv, iv;
   T q;
@@ -65,8 +70,6 @@ template <typename T, unsigned N>
   return r;
 }
 
-std::stack<node*> rtl_pred_stack, rtl_prev_stack;
-
 template <typename T> struct rtl_reg;
 
 template <typename T, unsigned M> struct rtl_assigner {
@@ -108,8 +111,9 @@ template <typename T> struct rtl_reg : public T {
   }
   
   T operator=(const T& r) {
+    if (rtl_pred_stack.empty()) std::cout << "PRED STACK EMPTY!" << std::endl;
     if (rtl_pred_stack.empty()) preds[sources] = Lit(1);
-    else                        preds[sources] = *rtl_pred_stack.top();
+    else                          preds[sources] = *rtl_pred_stack.top();
     src[sources] = r;
     ++sources;
 
@@ -169,7 +173,7 @@ template <typename T> struct rtl_wire : public T {
   
   T operator=(const T& r) {
     if (rtl_pred_stack.empty()) preds[sources] = Lit(1);
-    else                        preds[sources] = *rtl_pred_stack.top();
+    else                          preds[sources] = *rtl_pred_stack.top();
     src[sources] = r;
     ++sources;
 
@@ -204,64 +208,8 @@ template <typename T> struct rtl_wire : public T {
   vec<MAX_RTL, T> src;
   T initial;
 };
-
-void rtl_end() {
-  delete rtl_pred_stack.top();
-  delete rtl_prev_stack.top();
-  rtl_pred_stack.pop();
-  rtl_prev_stack.pop();
-}
-
-void rtl_if(node x) {
-  node prev, anyprev;
-
-  if (rtl_pred_stack.empty()) {
-    prev = Lit(1);
-  } else {
-    prev = *rtl_pred_stack.top();
-    anyprev = *rtl_prev_stack.top();
-  }
-
-  rtl_pred_stack.push(new node);
-  rtl_prev_stack.push(new node);
-
-  *rtl_pred_stack.top() = x && prev;
-  *rtl_prev_stack.top() = *rtl_pred_stack.top();
-}
-
-void rtl_elif(node x) {
-  if (rtl_pred_stack.empty()) {
-    std::cerr << "CHDL RTL: else without for." << std::endl;
-    std::abort();
-  }
-
-  node up;
-  node *anyprev = rtl_prev_stack.top();
-
-  delete rtl_pred_stack.top();
-  
-  rtl_pred_stack.pop();
-  rtl_prev_stack.pop();
-
-  if (rtl_pred_stack.empty()) up = Lit(1);
-  else                        up = *rtl_pred_stack.top();
-
-  rtl_pred_stack.push(new node);
-  rtl_prev_stack.push(new node);
-
-  *rtl_pred_stack.top() = up && !*anyprev && x;
-  *rtl_prev_stack.top() = *rtl_pred_stack.top() || *anyprev;
-  
-  delete anyprev;
-}
-
-void rtl_else() { rtl_elif(Lit(1)); }
-
-void tap_pred(std::string name) {
-  tap(name, *rtl_pred_stack.top());
-}
 };
-
+  
 #ifndef RTL_CONDITIONAL_MACROS
 #define IF(x) rtl_if(x);
 #define ELIF(x) rtl_elif(x);
