@@ -126,6 +126,28 @@ template <typename T> struct var {
 };
 
 template <typename T>
+  T operator+(var<T> &x) { return +T(x); }
+template <typename T>
+  T operator-(var<T> &x) { return -T(x); }
+
+template <unsigned N>
+  bvec<N> operator<<(var<bvec<N>> &a, var<bvec<CLOG2(N)>> &b) {
+    return bvec<N>(a) << bvec<N>(b);
+  }
+template <unsigned N>
+  bvec<N> operator>>(var<bvec<N>> &a, var<bvec<CLOG2(N)>> &b) {
+    return bvec<N>(a) >> bvec<N>(b);
+  }
+template <unsigned N>
+  bvec<N> operator<<(var<bvec<N>> &a, bvec<CLOG2(N)> b) {
+    return bvec<N>(a) << b;
+  }
+template <unsigned N>
+  bvec<N> operator>>(var<bvec<N>> &a, bvec<CLOG2(N)> b) {
+    return bvec<N>(a) >> b;
+  }
+
+template <typename T>
   T operator+(var<T> &a, const T &b) { return T(a) + b; }
 template <typename T>
   T operator+(const T &a, var<T> &b) { return a + T(b); }
@@ -133,6 +155,8 @@ template <typename T>
   T operator-(var<T> &a, const T &b) { return T(a) - b; }
 template <typename T>
   T operator-(const T &a, var<T> &b) { return a - T(b); }
+template <typename T>
+  T operator-(var<T> &a, var<T> &b) { return T(a) - T(b); }
 template <typename T>
   T operator*(var<T> &a, const T &b) { return T(a) * b; }
 template <typename T>
@@ -158,9 +182,29 @@ template <typename T>
 template <typename T>
   node operator>(const T &a, var<T> &b) { return a > T(b); }
 template <typename T>
+  node operator>(var<T> &a, var<T> &b) { return T(a) > T(b); }
+
+template <typename T>
+  node operator>=(var<T> &a, const T &b) { return T(a) >= b; }
+template <typename T>
+  node operator>=(const T &a, var<T> &b) { return a >= T(b); }
+template <typename T>
+  node operator>=(var<T> &a, var<T> &b) { return T(a) >= T(b); }
+
+template <typename T>
   node operator<(var<T> &a, const T &b) { return T(a) < b; }
 template <typename T>
   node operator<(const T &a, var<T> &b) { return a < T(b); }
+template <typename T>
+  node operator<(var<T> &a, var<T> &b) { return T(a) < T(b); }
+
+template <typename T>
+  node operator<=(var<T> &a, const T &b) { return T(a) <= b; }
+template <typename T>
+  node operator<=(const T &a, var<T> &b) { return a <= T(b); }
+template <typename T>
+  node operator<=(var<T> &a, var<T> &b) { return T(a) <= T(b); }
+
 template <typename T>
   node operator==(var<T> &a, const T &b) { return T(a) == b; }
 template <typename T>
@@ -169,6 +213,17 @@ template <typename T>
   node operator!=(var<T> &a, const T &b) { return T(a) != b; }
 template <typename T>
   node operator!=(const T &a, var<T> &b) { return a != T(b); }
+
+template <typename T>
+  T operator+=(var<T> &a, const T &b) { return (a = T(a) + T(b)); }
+template <typename T>
+  T operator+=(var<T> &a, var<T> &b) { return (a = T(a) + T(b)); }
+
+template <typename T>
+  T operator-=(var<T> &a, const T &b) { return (a = T(a) - T(b)); }
+template <typename T>
+  T operator-=(var<T> &a, var<T> &b) { return (a = T(a) - T(b)); }
+
 
 template <typename T> void tap(std::string name, const var<T> &x) {
   T xt;
