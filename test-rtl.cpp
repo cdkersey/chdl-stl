@@ -35,6 +35,7 @@ bool test_rtl() {
       } ENDIF;
     } ELIF(find) {
       IF(i * i >= Lit<NN>(N)) {
+	tap_pred("find_iez");
         i = z; find = Lit(0); readout = Lit(1);
       } ELIF(Mux(Zext<CLOG2(N)>(i), a)) {
         find = Lit(0);  mark = Lit(1);  j = i * i;
@@ -52,7 +53,7 @@ bool test_rtl() {
 	readout = Lit(0);
       } ELSE {
         i++;
-	console_valid = Mux(Zext<CLOG2(N)>(i), a);
+	console_valid = a[Zext<CLOG2(N)>(i)];
 	console_data = Zext<32>(i);
       } ENDIF;
     } ENDIF;
@@ -63,11 +64,8 @@ bool test_rtl() {
     TAP(z);
   }
 
-  optimize();
-
-  for (unsigned i = 0; i < 5000; ++i) {
+  for (unsigned i = 0; i < 5000; ++i)
     advance();
-  }
 
   return true;
 }
