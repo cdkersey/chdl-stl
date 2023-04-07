@@ -9,7 +9,7 @@
 
 namespace chdl {
 
-//extern std::stack<node *> rtl_pred_stack, rtl_prev_stack;
+extern std::stack<node *> rtl_pred_stack, rtl_prev_stack;
 
 node Reg(node d, node init);
 
