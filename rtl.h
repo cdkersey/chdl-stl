@@ -5,19 +5,21 @@
 #include <chdl/nodeimpl.h>
 #include <stack>
 #include <iostream>
+#include <vector>
 
 namespace chdl {
-const unsigned MAX_RTL = 64;
 
-extern std::stack<node *> rtl_pred_stack, rtl_prev_stack;
+//extern std::stack<node *> rtl_pred_stack, rtl_prev_stack;
 
 node Reg(node d, node init);
+
 void rtl_end();
 void rtl_if(node x);
 void rtl_elif(node x);
 void rtl_else();
+node rtl_pred();
 void tap_pred(std::string name);
-  
+
 template <typename T> T Reg(const T& d, const T &init) {
   bvec<sz<T>::value> qv, dv, iv;
   T q;
@@ -37,92 +39,190 @@ template <typename T> T Wreg(node wr, const T &d, const T &init) {
   return q;
 }
 
-template <typename T, unsigned N> T Mux1Hot(bvec<N> sel, vec<N, T> in) {
-  bvec<sz<T>::value> rv;
-  T r;
-  Flatten(r) = rv;
-
-  vec<N, bvec<sz<T>::value> > inv;
-  vec<sz<T>::value, bvec<N> > invt;
-
-  for (unsigned i = 0; i < N; ++i) {
-    inv[i] = Flatten(in[i]);
-
-    for (unsigned j = 0; j < sz<T>::value; ++j)
-      invt[j][i] = inv[i][j];
-  }
- 
-  for (unsigned i = 0; i < sz<T>::value; ++i)
-    rv[i] = OrN(sel & invt[i]);
-  
-  return r;
-}
-
-template <typename T, unsigned N>
-  vec<N, T> Repl(const vec<N, T> &in, bvec<CLOG2(N)> idx, const T &x)
-{
-  vec<N, T> r;
-  bvec<N> idx1h(Zext<N>(Decoder(idx)));
-  
-  for (unsigned i = 0; i < N; ++i)
-    r[i] = Mux(idx1h[i], in[i], x);
-
-  return r;
-}
-
-template <typename T> struct rtl_reg;
-
-template <typename T, unsigned M> struct rtl_assigner {
-  rtl_assigner(rtl_reg<T> &r, bvec<M> idx): idx(idx), r(r) {}
-
-  template <typename U> U operator=(const U &x) {
-    r.assign_idx(idx, x);
-    return x;
+struct rtl_nodelist_t {
+  rtl_nodelist_t(node x, node n, rtl_nodelist_t **p): x(x), n(n), next(*p) {
+    *p = this;
   }
 
-  template <typename U>
-    U operator+=(const U &x) { return r.assign_idx(idx, Mux(idx, r) + x); }
-  template <typename U>
-    U operator-=(const U &x) { return r.assign_idx(idx, Mux(idx, r) - x); }
-  template <typename U>
-    U operator*=(const U &x) { return r.assign_idx(idx, Mux(idx, r) * x); }
-  template <typename U>
-    U operator/=(const U &x) { return r.assign_idx(idx, Mux(idx, r) / x); }
-  template <typename U>
-    U operator%=(const U &x) { return r.assign_idx(idx, Mux(idx, r) % x); }
-  template <typename U>
-    U operator&=(const U &x) { return r.assign_idx(idx, Mux(idx, r) & x); }
-  template <typename U>
-    U operator|=(const U &x) { return r.assign_idx(idx, Mux(idx, r) | x); }
-  template <typename U>
-    U operator^=(const U &x) { return r.assign_idx(idx, Mux(idx, r) ^ x); }
+  ~rtl_nodelist_t() { if (next) delete next; }
 
-  bvec<M> idx;
-  rtl_reg<T> &r;
+  node OrN() {
+    if (next) return n || next->OrN();
+    else return n;
+  }
+
+  node MuxN(node dft) {
+    if (next) return Mux(n, next->MuxN(dft), x);
+    else return Mux(n, dft, x);
+  }
+
+  node n, x;
+  rtl_nodelist_t *next;
 };
 
-template <typename T> struct rtl_reg : public T {
-  rtl_reg(): sources(0) { Flatten(initial) = Lit<sz<T>::value>(0); }
-  rtl_reg(const T& initial): sources(0), initial(initial) {}
+template <typename T> struct element { typedef T type; };
 
-  ~rtl_reg() {
-    node wr = OrN(preds);
-    T(*this) = Wreg(OrN(preds), Mux1Hot(preds, src), initial);
-  }
-  
-  T operator=(const T& r) {
-    if (rtl_pred_stack.empty()) std::cout << "PRED STACK EMPTY!" << std::endl;
-    if (rtl_pred_stack.empty()) preds[sources] = Lit(1);
-    else                          preds[sources] = *rtl_pred_stack.top();
-    src[sources] = r;
-    ++sources;
+template <unsigned N, typename T>
+  struct element<vec<N, T> > { typedef T type; };
+
+template <typename T>
+  struct elements { const static unsigned value = 1; };
+
+template <unsigned N, typename T>
+  struct elements<vec<N, T> > { const static unsigned value = N; };
+
+template <typename T> struct assigner {
+  assigner() {}
+
+  assigner(const T &x): x(x) {}
+
+  assigner<typename element<T>::type>
+    operator[](bvec<CLOG2(elements<T>::value)> idx)
+  {
+    const unsigned ESZ = sz<typename element<T>::type>::value;
+    assigner<typename element<T>::type> r;
+    bvec<ESZ> vr = Flatten(r);
+    bvec<sz<T>::value> vx(Flatten(x));
+
+    for (unsigned i = 0; i < sz<T>::value; ++i) {
+      vx[i] = vr[i % ESZ];
+      mask[i] = (idx == Lit<CLOG2(elements<T>::value)>(i / ESZ))
+        && r.mask[i % ESZ];
+    }
 
     return r;
   }
 
+  assigner<typename element<T>::type> operator[](unsigned idx) {
+    const unsigned ESZ = sz<typename element<T>::type>::value;
+    assigner<typename element<T>::type> r;
+    bvec<ESZ> vr = Flatten(r.x);
+    bvec<sz<T>::value> vx(Flatten(x));
+
+    for (unsigned i = idx*ESZ; i < (idx + 1)*ESZ; ++i) {
+      vx[i] = vr[i % ESZ];
+      mask[i] = r.mask[i % ESZ];
+    }
+
+    return r;
+  }
+
+  template <unsigned A, unsigned B>
+    assigner<vec<B - A + 1, typename element<T>::type> >
+      operator[](range<A, B> l)
+  {
+    const unsigned N = B - A + 1;
+    const unsigned ESZ = sz<typename element<T>::type>::value;
+    assigner<vec<N, typename element<T>::type> > r;
+    bvec<ESZ*N> vr = Flatten(r.x);
+    bvec<sz<T>::value> vx(Flatten(x));
+
+    for (unsigned i = A*ESZ; i < (B + 1)*ESZ; ++i) {
+      vx[i] = vr[i - A*ESZ];
+      mask[i] = r.mask[i - A*ESZ];
+    }
+
+    return r;
+  }
+
+  T operator=(const T &y) {
+    mask = bvec<sz<T>::value>(rtl_pred());
+    x = y;
+    return x;
+  }
+
+  operator T() { return x; }
+
+  bvec<sz<T>::value> mask;
+  T x;
+};
+
+
+template <typename T, unsigned DLY = 1> struct rtl_reg : public T {
+  rtl_reg(): preds(sz<T>::value) {}
+  rtl_reg(const T& initial): initial(initial), preds(sz<T>::value) {}
+
+  node regchain(node d, node initial, unsigned n) {
+    if (n == 0) return d;
+
+    return Reg(regchain(d, initial, n - 1), initial);
+  }
+  
+  ~rtl_reg() {
+    bvec<sz<T>::value> v = Flatten(*this), iv = Flatten(initial);
+
+    for (unsigned i = 0; i < sz<T>::value; ++i) {
+      if (preds[i]) {
+        v[i] = regchain(preds[i]->MuxN(DLY>0 ? v[i] : iv[i]), iv[i], DLY);
+        delete preds[i];
+      } else {
+        v[i] = iv[i];
+      }
+    }
+  }
+
+  T operator=(const T& r) {
+    bvec<sz<T>::value> rv = Flatten(r);
+
+    for (unsigned i = 0; i < sz<T>::value; ++i)
+      new rtl_nodelist_t(rv[i], rtl_pred(), &preds[i]);
+
+    return *this;
+  }
+
   T operator=(const rtl_reg<T>& r) {
-    *this = (T)r;
-    return (T)*this;
+    *this = ((T)r);
+
+    return *this;
+  }
+
+  assigner<typename element<T>::type>
+    operator[](bvec<CLOG2(elements<T>::value)> idx)
+  {
+    const unsigned SZ(sz<T>::value),
+                   ESZ(sz<typename element<T>::type>::value);
+
+    assigner<typename element<T>::type> r;
+    bvec<ESZ> rv(Flatten(r.x));
+
+    for (unsigned i = 0; i < SZ; ++i) {
+      node indexed = (idx == Lit<CLOG2(elements<T>::value)>(i/ESZ))
+        && r.mask[i%ESZ];
+      new rtl_nodelist_t(rv[i % ESZ], rtl_pred() && indexed, &preds[i]);
+    }
+
+    return r;
+  }
+
+  assigner<typename element<T>::type> operator[](unsigned idx) {
+    const unsigned ESZ(sz<typename element<T>::type>::value);
+
+    assigner<typename element<T>::type> r;
+    bvec<ESZ> rv(Flatten(r.x));
+
+    for (unsigned i = idx*ESZ; i < (idx + 1)*ESZ; ++i) {
+      node indexed = r.mask[i%ESZ];
+      new rtl_nodelist_t(rv[i % ESZ], rtl_pred() && indexed, &preds[i]);
+    }
+
+    return r;
+  }
+
+  template <unsigned A, unsigned B>
+    assigner<vec<B - A + 1, typename element<T>::type> >
+      operator[](range<A, B> l)
+  {
+    const unsigned ESZ(sz<typename element<T>::type>::value);
+
+    assigner<vec<B - A + 1, typename element<T>::type> > r;
+    bvec<ESZ*(B - A + 1)> rv(Flatten(r.x));
+
+    for (unsigned i = A*ESZ; i < (B + 1)*ESZ; ++i) {
+      node indexed = r.mask[i - A*ESZ];
+      new rtl_nodelist_t(rv[i - A*ESZ], rtl_pred() && indexed, &preds[i]);
+    }
+
+    return r;
   }
 
   T operator++(int) { *this = *this + Lit<sz<T>::value>(1); return *this; }
@@ -137,79 +237,20 @@ template <typename T> struct rtl_reg : public T {
   T operator&=(const T &x) { return (*this = *this & x); }
   T operator|=(const T &x) { return (*this = *this | x); }
   T operator^=(const T &x) { return (*this = *this ^ x); }
+
   template <typename U>
     T operator<<=(const U &x) { return (*this = *this << x); }
   template <typename U>
     T operator>>=(const U &x) { return (*this = *this >> x); }
 
-  template <typename U, unsigned M>
-    U assign_idx(bvec<M> idx, const U &x)
-  {
-    *this = Repl(T(*this), idx, x);
-    return x;
-  }
-
-  template <unsigned M> rtl_assigner<T, M> operator[](bvec<M> idx) {
-    return rtl_assigner<T, M>(*this, idx);
-  }
-
-  template <typename U> auto operator[](const U& idx)
-  {
-    return ((T)*this)[idx];
-  }
-  
-  int sources;
-  bvec<MAX_RTL> preds;
-  vec<MAX_RTL, T> src;
   T initial;
+  std::vector<rtl_nodelist_t *> preds;
 };
 
-template <typename T> struct rtl_wire : public T {
-  rtl_wire(): sources(0) {}
+template <typename T> using rtl_wire = rtl_reg<T, 0>;
 
-  ~rtl_wire() {
-    T(*this) = Mux1Hot(preds, src);
-  }
-  
-  T operator=(const T& r) {
-    if (rtl_pred_stack.empty()) preds[sources] = Lit(1);
-    else                          preds[sources] = *rtl_pred_stack.top();
-    src[sources] = r;
-    ++sources;
-
-    return r;
-  }
-
-#if 0
-  T operator+=(const T &x) { return (*this = *this + x); }
-  T operator-=(const T &x) { return (*this = *this - x); }
-  T operator*=(const T &x) { return (*this = *this * x); }
-  T operator/=(const T &x) { return (*this = *this / x); }
-  T operator%=(const T &x) { return (*this = *this % x); }
-  T operator&=(const T &x) { return (*this = *this & x); }
-  T operator|=(const T &x) { return (*this = *this | x); }
-  T operator^=(const T &x) { return (*this = *this ^ x); }
-  template <typename U>
-    T operator<<=(const U &x) { return (*this = *this << x); }
-  template <typename U>
-    T operator>>=(const U &x) { return (*this = *this >> x); }
-
-
-  template <typename U, unsigned M>
-    U assign_idx(bvec<M> idx, const U &x)
-  {
-    *this = Repl(T(*this), idx, x);
-    return x;
-  }
-#endif
-
-  int sources;
-  bvec<MAX_RTL> preds;
-  vec<MAX_RTL, T> src;
-  T initial;
 };
-};
-  
+
 #ifndef RTL_CONDITIONAL_MACROS
 #define IF(x) rtl_if(x);
 #define ELIF(x) rtl_elif(x);

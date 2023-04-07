@@ -48,7 +48,7 @@ void chdl::rtl_elif(node x) {
   rtl_prev_stack.pop();
 
   if (rtl_pred_stack.empty()) up = Lit(1);
-  else                          up = *rtl_pred_stack.top();
+  else                        up = *rtl_pred_stack.top();
 
   rtl_pred_stack.push(new node);
   rtl_prev_stack.push(new node);
@@ -61,6 +61,10 @@ void chdl::rtl_elif(node x) {
 
 void chdl::rtl_else() { rtl_elif(Lit(1)); }
 
+node chdl::rtl_pred() {
+  return rtl_pred_stack.empty() ? Lit(1) : *rtl_pred_stack.top();
+}
+
 void chdl::tap_pred(std::string name) {
-  tap(name, *rtl_pred_stack.top());
+  tap(name, rtl_pred());
 }
