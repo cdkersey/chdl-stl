@@ -71,9 +71,8 @@ template <typename T>
 template <unsigned N, typename T>
   struct elements<vec<N, T> > { const static unsigned value = N; };
 
-template <typename T> struct assigner {
+template <typename T> struct assigner : public T {
   assigner() {}
-
   assigner(const T &x): x(x) {}
 
   assigner<typename element<T>::type>
@@ -81,8 +80,10 @@ template <typename T> struct assigner {
   {
     const unsigned ESZ = sz<typename element<T>::type>::value;
     assigner<typename element<T>::type> r;
-    bvec<ESZ> vr = Flatten(r);
+    bvec<ESZ> vr = Flatten(r.x);
     bvec<sz<T>::value> vx(Flatten(x));
+
+    ((typename element<T>::type)r) = Mux(idx, (T)*this);
 
     for (unsigned i = 0; i < sz<T>::value; ++i) {
       vx[i] = vr[i % ESZ];
@@ -98,6 +99,8 @@ template <typename T> struct assigner {
     assigner<typename element<T>::type> r;
     bvec<ESZ> vr = Flatten(r.x);
     bvec<sz<T>::value> vx(Flatten(x));
+
+    ((typename element<T>::type)r) = ((T)*this)[idx];
 
     for (unsigned i = idx*ESZ; i < (idx + 1)*ESZ; ++i) {
       vx[i] = vr[i % ESZ];
@@ -117,6 +120,8 @@ template <typename T> struct assigner {
     bvec<ESZ*N> vr = Flatten(r.x);
     bvec<sz<T>::value> vx(Flatten(x));
 
+    ((vec<N, typename element<T>::type>)r) = ((T)*this)[range<A, B>()];
+
     for (unsigned i = A*ESZ; i < (B + 1)*ESZ; ++i) {
       vx[i] = vr[i - A*ESZ];
       mask[i] = r.mask[i - A*ESZ];
@@ -128,13 +133,11 @@ template <typename T> struct assigner {
   T operator=(const T &y) {
     mask = bvec<sz<T>::value>(rtl_pred());
     x = y;
-    return x;
+    return y;
   }
 
-  operator T() { return x; }
-
-  bvec<sz<T>::value> mask;
   T x;
+  bvec<sz<T>::value> mask;
 };
 
 
@@ -153,7 +156,7 @@ template <typename T, unsigned DLY = 1> struct rtl_reg : public T {
 
     for (unsigned i = 0; i < sz<T>::value; ++i) {
       if (preds[i]) {
-        v[i] = regchain(preds[i]->MuxN(DLY>0 ? v[i] : iv[i]), iv[i], DLY);
+        v[i] = regchain(preds[i]->MuxN(DLY > 0 ? v[i] : iv[i]), iv[i], DLY);
         delete preds[i];
       } else {
         v[i] = iv[i];
@@ -185,6 +188,8 @@ template <typename T, unsigned DLY = 1> struct rtl_reg : public T {
     assigner<typename element<T>::type> r;
     bvec<ESZ> rv(Flatten(r.x));
 
+    ((typename element<T>::type)r) = Mux(idx, ((T)*this));
+
     for (unsigned i = 0; i < SZ; ++i) {
       node indexed = (idx == Lit<CLOG2(elements<T>::value)>(i/ESZ))
         && r.mask[i%ESZ];
@@ -199,6 +204,8 @@ template <typename T, unsigned DLY = 1> struct rtl_reg : public T {
 
     assigner<typename element<T>::type> r;
     bvec<ESZ> rv(Flatten(r.x));
+
+    ((typename element<T>::type)r) = ((T)*this)[idx];
 
     for (unsigned i = idx*ESZ; i < (idx + 1)*ESZ; ++i) {
       node indexed = r.mask[i%ESZ];
@@ -216,6 +223,8 @@ template <typename T, unsigned DLY = 1> struct rtl_reg : public T {
 
     assigner<vec<B - A + 1, typename element<T>::type> > r;
     bvec<ESZ*(B - A + 1)> rv(Flatten(r.x));
+
+    ((vec<B - A + 1, typename element<T>::type>)r) = ((T)*this)[range<A,B>()];
 
     for (unsigned i = A*ESZ; i < (B + 1)*ESZ; ++i) {
       node indexed = r.mask[i - A*ESZ];
